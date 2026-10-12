@@ -21,7 +21,10 @@ Motion on/off controls scroll reveals, card entrances, answer reveals, and
 transitions. Your device reduced-motion setting is always respected. A thin
 bar at the top shows scroll progress. Animations do not delay answering.
 
-Every flashcard includes a technical definition, an original imagined training
+Every reference entry and flashcard includes a concise definition, an emphasized
+exam takeaway, and a concrete example or implementation idea. Reference examples
+expand on demand; flashcard examples appear after Reveal. Optional anime memory
+aids expand separately. Every flashcard also includes an original imagined training
 analogy using Jujutsu Kaisen, Naruto, or Demon Slayer, and a Connect it note
 explaining the OS mapping. These memory aids are not claims about show events.
 
@@ -36,6 +39,10 @@ WHAT IS INCLUDED
 - Session results: correct completions, incorrect attempts, first-attempt
   completions and accuracy, elapsed time, and topic breakdowns.
 - Untimed retry of the unique questions missed during a session.
+- Quizzes 1–3: module-scoped practice for Foundations, Processes & threads,
+  and Scheduling. Choose 10 randomized questions or the full topic set.
+  These use the existing practice bank, not unavailable original quiz questions.
+  Feedback, retry gating, results, and local history match Study Mode.
 
 CHALLENGE ACTIVITIES
 Choose an activity, fill its fields, then press Check answers (or Enter).
