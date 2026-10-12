@@ -1,0 +1,354 @@
+
+4.2: Semaphores
+
+Activities:
+P
+Participation
+Due: 09/17/2026, 11:59 PM CDT
+4.2 Semaphores
+The software solution to the CS problem has several major shortcomings:
+
+The solution works only for 2 processes. When 3 or more processes need to share a CS, a different solution must be developed.
+The solution is inefficient. While one process is in the CS, the other process must wait by repeatedly testing and setting the synchronization variables. The waiting process is only wasting CPU and memory resources without accomplishing any useful work.
+The solution addresses only competition among processes. To address problems of process cooperation, entirely different solutions must be devised.
+Basic principles of semaphores
+Semaphores are general-purpose primitives that allow solving a variety of synchronization problems in a systematic manner.
+
+A semaphore s is a non-negative integer variable that can be accessed using only two special operations, P and V.
+
+V(s): increment s by 1
+P(s): if s > 0, decrement s by 1, otherwise wait until s > 0
+The implementation of P and V must guarantee that:
+If several processes simultaneously invoke P(s) or V(s), the operations will occur sequentially in some arbitrary order.
+If more than one process is waiting inside P(s) for s to become > 0 , one of the waiting processes is selected to complete the P(s) operation. The selection can be at random but a typical implementation maintains the blocked processes in a queue processed in FIFO order.
+participation activity
+4.2.1: P and V operations on a semaphore.
+
+
+
+ Simultaneous execution psq Interleaved execution pqsV(s)V(s)V(s)V(s)P(s)V(s)P(s)P(s)P(s)P(s)P(s)010131010121P(s)
+
+Captions
+Two concurrent processes p and q share a semaphore s. The initial value is s = 1.
+p executes V(s), which increments s by 1.
+q executes P(s) twice. Since s = 2, each P(s) operation successfully decrements s and q continues executing.
+When p executes P(s), s = 0 and so p becomes blocked on s.
+When q executes V(s), s becomes 1, which unblocks p. The P(s) operation by p can now decrement s and p may continue executing.
+When p and q execute V(s) simultaneously, the implementation executes the operations in a random order. The value of s is incremented by 2.
+Similarly, when p and q execute P(s) simultaneously, the implementation executes the operations in a random order. The value of s is decremented by 2 and p and q continue.
+When s = 1 and both processes execute P(s) then one process is chosen at random to process while the other process is blocked on the semaphore.
+When a V(s) operation increments s again, p becomes unblocked.
+The P(s) operation can now complete by decrementing s and p may continue.
+
+participation activity
+4.2.2: Changes to a semaphore.
+s = 0 initially.
+Process p1 executes the sequence: P(s); P(s); V(s);
+Process p2 executes the sequence: V(s); V(s);
+
+1)
+After both processes terminate, s = _____.
+2)
+Which statement will terminate first?
+
+participation activity
+4.2.3: Possible sequence of statement executions.
+Three processes execute the following sequences concurrently:
+p1:
+P(s1)
+A
+V(s1)
+p2:
+P(s2)
+B
+V(s1)
+p3:
+P(s1)
+C
+V(s1)
+If s1 = 0 and s2 = 1, in which order can the statements A, B, and C execute.
+
+The CS problem using semaphores
+Semaphores offer a very intuitive and elegant solution to the CS problem that satisfies all requirements. A single semaphore, initialized to 1, is sufficient to solve the problem for any number of processes.
+
+participation activity
+4.2.4: The critical section problem using semaphores.
+
+mutex Process p1  Process pi  Process pn ......10while (1) {...
+P(mutex)
+CSV(mutex)
+...}while (1) {...
+P(mutex)
+CSV(mutex)
+...}while (1) {...
+P(mutex)
+CSV(mutex)
+...}
+
+Captions
+n concurrent processes need to access a CS. A semaphore mutex (named for mutual exclusion), is initially set to 1.
+Before entering the CS, a process executes P(mutex), which sets mutex to 0. After leaving CS, the process increments mutex back to 1 using V(mutex).
+If no other process is trying to enter CS then p1 can enter CS repeatedly. Thus lockout is not possible.
+When multiple processes try to enter CS simultaneously, only one will pass P(mutex). All others block. Thus mutual exclusion is guaranteed and deadlock is not possible.
+Upon exiting CS, the current process executes V(mutex). When mutex becomes 1, the waiting P(mutex) operations again compete with each other for entry into CS.
+One of the blocked processes is chosen at random (p1) and enters the CS. pi may continue but starvation is not possible since pi cannot reenter CS before p1.
+When p1 exits CS, the V(mutex) operation again enables one of the waiting processes, one of which is chosen at random to proceed into CS.
+
+participation activity
+4.2.5: Properties of the solution to the CS problem.
+1)
+The semaphore mutex can only have the values 0 or 1.
+2)
+When each process runs on a separate CPU then mutual exclusion cannot be guaranteed.
+3)
+If p1 runs on a faster CPU than the other processes then p1 can execute CS multiple times before another process gets a turn.
+
+The bounded-buffer problem
+The bounded-buffer problem is a classic synchronization problem intended to illustrate process cooperation. A producer process shares a buffer with a consumer process. The buffer has a fixed number of slots. The producer fills empty slots with data in increasing order. The consumers follows the producer by removing the data in the same order. The buffer is called a circular buffer because, upon reaching the last slot, each process continues with the first slot (modulo n).
+The solution must guarantee the following:
+
+Consumers do not overtake producers and access empty slots.
+Producers do not overtake consumers and overwrite full slots.
+participation activity
+4.2.6: Operation of the bounded buffer.
+
+N-10...next_innext_out
+
+Captions
+Multiple producers and consumers share a bounded buffer of length N. Initially, all slots are empty. The index next_in shows the slot to be filled next and next_out shows the slot to be emptied next.
+All slots are empty and thus only a producer can start by filling the first slot and advancing next_in to the next slot.
+The producers can continue by filling more slots and advancing next_in each time.
+As soon as the first slot is filled, the consumers can start emptying the slots in the same order and advancing the index next_out each time.
+When a producer reaches the last slot, N-1, the index next_in is advanced by 1 modulo N, thus going back to slot 0.
+The producers and the consumers can follow each other indefinitely around the buffer.
+The solution must guarantee that, when the last slot is emptied (next_in = next_out), no consumer may proceed any further to avoid accessing empty or outdated slots.
+Similarly, when consumers fall behind, producers must stop when all slots are full (next_in = next_out) to avoid overwriting data not yet consumed.
+
+participation activity
+4.2.7: Operation of the bounded buffer.
+1)
+Initially, next_in = next_out.
+2)
+Whenever next_in = next_out, all buffer slots are empty.
+3)
+When the consumer pauses, the producer can fill all slots.
+4)
+When the producer and the consumer run at approximately the same constant speed, then the buffer should consist of a _____ number of slots.
+5)
+When the producer always runs much faster than the consumer then the buffer should consist of a _____ number of slots.
+6)
+When the producer and the consumer run at highly varying speeds then the buffer should consist of a _____ number of slots.
+
+The bounded-buffer problem using semaphores
+Semaphores offer a very intuitive and elegant solution to the bounded-buffer problem that satisfies the requirements that producers do not overtake consumers and vice versa.
+
+Two semaphores are used to coordinate the processes. The semaphore f represents the number of full buffer slots and is incremented each time the producer places a new data item into the buffer and decremented each time the consumer removes an item from the buffer. The semaphore e represents the number of empty slots and is modified by the producer and consumer analogously.
+
+participation activity
+4.2.8: The bounded-buffer problem using semaphores.
+
+ Producer  Consumer 1efInitially: f = 0; e = n;0n12n-1n-2n0n-11while (1) {produce dataplace data into bufferV(f)while (1) {P(e)P(f)remove data from buffer V(e)process data}}
+
+Captions
+A producer and a consumer share a buffer of size n. Initially, the semaphores e and f are set to show that all slots are empty.
+Since no slot is full (f = 0 and e = n), the consumer becomes blocked on P(f).
+The producer passes P(e), which decrements e to n-1.
+After depositing a data item into the buffer, the producer executes V(f), which increments the number of full buffer slots to 1 and enables the consumer to proceed.
+At this point either or both processes may continue. If the producer continues filling successive slots, e is decremented and f is incremented with each new data item.
+The consumer may follow by decrementing f and incrementing e each time a buffer slot is emptied.
+If the producer runs ahead and fills all slots, f = n and e = 0. The producer is now blocked from overrunning the consumer and overwriting slots not yet copied by the consumer.
+Only after the consumer has emptied at least one slot and incremented e is the producer able to continue.
+
+participation activity
+4.2.9: Parameters of the bounded buffer solution.
+Assume the buffer is implemented as an array in the range [0:99].
+
+1)
+Initially, f = _____.
+
+    
+
+
+Show answer
+2)
+Initially, e = _____.
+
+    
+
+
+Show answer
+3)
+After the producer fills 100 slots and the consumer empties 90 slots, f = _____.
+
+    
+
+
+Show answer
+
+participation activity
+4.2.10: Ideal number of buffer slots.
+If filling the buffer takes the same time as emptying the buffer and all other computations are negligible, then the ideal number of buffer slots is ________.
+
+challenge activity
+4.2.1: Bounded buffer.
+764382.5329120.qx3zqy7
+Consider the solution to the bounded buffer problem with n buffer slots. The variable next_in points to the buffer slot to be filled in next by a producer, and the variable next_out points to the buffer slot to be emptied next by a consumer. Assume: n = 8, next_in = 5, next_out = 1
+A consumer can execute                    times before blocking.A producer can execute                     times before blocking.
+Ex: 5
+1
+2
+3
+4
+1
+2
+3
+4
+
+Exercise
+4.2.1: Using P and V to enforce precedence of execution.
+
+Four processes are executing the computations A through H:
+
+p1:
+A
+B
+C
+D
+p2:
+E
+F
+p3:
+G
+p4:
+H
+The computations must be executed in the order given by the following precedence graph.
+
+Process A starts and splits into 3 branches, E, B, H. Branch E splits into F and G. Branches F and B merge and continue as C. Branches G, C, and H merge and continue as D.
+(a)
+Insert P and V operations into the code to enforce the prescribed order. For example, since E and H must wait for A to complete, the processes p2 and p4 must each start with a P operation and A must end with 2 corresponding V operations.
+
+(b)
+What are the initial semaphore values?.
+
+
+Exercise
+4.2.2: Using P and V to enforce precedence of execution.
+
+Two processes are concurrently evaluating the expression (a + b) *(c + d) - (e/f). The semaphore s, initially 0, guarantees that t2 and t3 complete before being used in p1:
+
+p1:
+t1 = a + b
+P(s)
+t4 = t1*t2
+t5 = t4 - t3
+p2:
+t2 = c + d
+t3 = e/f
+V(s)
+(a)
+Extend the solution such that t3 is computed concurrently with t2 by a third process.
+
+
+Exercise
+4.2.3: Controlling concurrent executions.
+
+A and B represent some arbitrary computations in the functions f1 and f2. An unbounded number of processes are invoking either of the two functions.
+
+f1():
+P(s1) 
+c1 = c1 + 1 
+if (c1 == 1) P(d)
+V(s1) 
+A 
+P(s1)
+c1 = c1 - 1 
+if (c1 == 0) V(d) 
+V(s1)
+f2():
+P(s2)
+c2 = c2 + 1
+if (c2 == 1) P(d)
+V(s2)
+B
+P(s2)
+c2 = c2 - 1
+if (c2 == 0) V(d)
+V(s2)
+Initially, s1 = s2 = d = 1; c1 = c2 = 0. All semaphores and variables are shared.
+
+(a)
+How many invocations of the computation A can proceed concurrently and what are the values of s1, c1, and d?
+
+(b)
+While A is running, how many invocations of B can proceed concurrently and what are the values of s2, c2, and d?
+
+(c)
+Can A or B starve? Why or why not??
+
+
+Exercise
+4.2.4: Details of the bounded buffer problem.
+
+Assume the declarations:
+
+int buffer[n];
+int data;
+int next_in = next_out = 0;
+
+(a)
+Expand the pseudocode statements "place data into buffer" and "remove data from buffer" of the bounded buffer code by showing the specific changes to the above variables.
+
+
+Exercise
+4.2.5: The bounded buffer problem without semaphores.
+
+(a)
+Modify the pseudocode for the bounded buffer problem from the previous exercise without using semaphores for synchronization. Instead, the consumer uses a while loop to wait in case all buffers are empty. Similarly, the producer uses a while loop to wait if no buffer slots are available for writing. To prevent the producer from overtaking the consumer, enforce that at most n - 1 buffer slots can be full. Thus the condition (next_in == next_out) is true only when all slots are empty.
+
+
+Exercise
+4.2.6: Bounded buffer with multiple producers/consumers.
+
+To implement the circular nature of the bounded-buffer problem, the producer fills the slot buffer[next_in] and then increments next_in by 1 mod n. Similarly, the consumer empties the slot buffer[next_out] and then increments next_out by 1 mod n.
+
+(a)
+What problem would occur if multiple producers or multiple consumers executed the bounded buffer code?
+
+(b)
+Extend the bounded-buffer problem to allow multiple producer and multiple consumer processes.
+
+
+Exercise
+4.2.7: Simulation of a one-way intersection.
+
+
+(a)
+Simulate the traffic at the intersection of two one-way streets using semaphores. The traffic must obey the following rules:
+
+Only one car can be crossing at any given time.
+When a car reaches the intersection and no other cars are approaching from the other direction, then the car must be allowed to proceed immediately.
+Cars arriving from both directions simultaneously must take turns in crossing.
+The solution should obey the following principles:
+
+A car approaching from one direction is modeled by incrementing a corresponding counter (Ex: ns for north-south, ew for east-west).
+A busy flag indicates whether the intersection is free or whether a car is currently crossing.
+When busy is true, a car blocks on a semaphore corresponding to the car's direction.
+A blocked car is unblocked when the currently crossing car leaves the intersection.
+
+Exercise
+4.2.8: Using different synchronization primitives.
+
+Given the synchronization primitives:
+ADVANCE(x): x = x + 1
+AWAIT(x, c): while x < c, block the invoking process
+
+(a)
+Develop a solution to the bounded-buffer problem.
+
+
+How was this section?
+
+|
+
+
+Provide section feedback

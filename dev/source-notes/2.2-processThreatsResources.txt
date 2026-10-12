@@ -1,0 +1,161 @@
+
+Section 2.2 is a part of 1 assignment:
+RD2 Processes, Threads, and Resources
+This assignment's due date has passed. Activity will still be recorded, but will not count towards this assignment (unless the due date is changed). See this article for more info.
+
+Activities:
+P
+Participation
+Due: 09/03/2026, 11:59 PM CDT
+2.2 Why processes
+Virtual CPUs
+Structuring an application as processes allows independence from the:
+
+Number of CPUs: A physical CPU is a real hardware instance of a CPU. Multiple processes may run on one physical CPU using a technique known as time sharing. Each process is given a virtual CPU: A CPU that the process assumes is available only to itself.
+Type of CPU: A virtual CPU can be just an abstraction of the physical CPU or it can be software that emulates the behavior of a different CPU.
+participation activity
+2.2.1: Multiple processes can run on different hardware configurations but in all cases each process can assume having the same private physical CPU.
+
+p1CPUp2CPUpnCPU...p1p2vCPUpnvCPU...p1vCPUp2vCPUpnvCPU...CPUCPUVirtual
+CPUs
+vCPUPhysical
+ CPUs
+(a)(b)(c)
+
+Captions
+Each process can have a separate physical CPU.
+All processes can time-share the same CPU, which is repeatedly switched among the processes.
+The time-sharing of the CPU is transparent to the processes, which creates the illusion for each process to have a separate CPU: a virtual CPU.
+A different physical CPU with a different instruction set may be substituted without changing or recompiling the code of the processes.
+With a different physical CPU, the virtual CPUs are not just illusions but are implemented in software and emulate the behavior of the original CPU. The processes remain unchanged.
+
+participation activity
+2.2.2: Changing CPUs.
+In parts (b) and (c) of the animation, _________.
+
+participation activity
+2.2.3: Number of virtual vs physical CPUs.
+1)
+What is the maximum number of physical CPUs an application consisting of 3 processes can utilize?
+
+    
+
+
+Show answer
+2)
+What is the minimum number of physical CPUs an application consisting of 3 processes can utilize?
+
+    
+
+
+Show answer
+3)
+On how many virtual CPUs will the 3 processes run?
+
+    
+
+
+Show answer
+
+Benefits of virtual CPUs
+Independence from the number and type of CPUs provides several crucial benefits:
+
+Multi-user support: Multiple users, each represented by one or more separate processes, can share the same machine without being aware of each other.
+Multi-CPU transparency: An application written to utilize multiple CPUs will run correctly, although perhaps more slowly, if only one CPU is available.
+Portability: An application compiled for one type of CPU can run on a different CPU without being modified or even recompiled.
+participation activity
+2.2.4: Code portability between different types of CPU.
+
+......fpadd r1,r2,r3Executable codeFetch instruction
+...Execution trace
+on a CPU
+.........fpadd r1,r2,r3Executable codeCall fpadd(r1,r2,r3)
+                 { code }
+......Execute
+Fetch instruction
+floating point
+instructions
+withExecution trace
+on a CPU
+floating point
+instructions
+without
+
+Captions
+A program containing a floating point add instruction (fpadd) is to be executed.
+The CPU fetches and decodes the instruction.
+If the CPU supports floating point instructions, then the fpadd instruction is simply executed directly in hardware by adding the contents of the registers r1 + r2 and storing the sum in r3 .
+The same program can be executed without any changes on a CPU without floating point operations. The floating point operations are implemented by the virtual CPU in software.
+The virtual CPU software fetches the instruction and, transparently to the program, executes the fpadd instruction using a corresponding software function.
+
+participation activity
+2.2.5: Using a simpler CPU.
+When the CPU with floating operations is replaced with a CPU without floating point operations, then __________.
+
+participation activity
+2.2.6: Changing the number of CPUs.
+3 independent processes are executing on 2 physical CPUs.
+
+1)
+Decreasing the number of CPUs from 2 to 1 will __________ speed of execution.
+2)
+Increasing the number of CPUs from 2 to 3 will __________ speed of execution.
+3)
+Increasing the number of CPUs further from 3 to 4 will __________ speed of execution.
+
+participation activity
+2.2.7: Physical vs virtual CPUs.
+1)
+An application running on multiple physical CPUs must be modified in order to run correctly on a single CPU.
+2)
+The main purpose of virtual CPUs is to improve the performance of a system.
+
+A modular structuring concept
+An application can generally be divided into multiple tasks, each implemented as a process. Using multiple cooperating processes instead of one has several important advantages:
+
+The interfaces between the processes are simple and easy to understand.
+Each process can be designed and studied in isolation.
+The implementation reduces idle time by overlapping the execution of multiple processes.
+Different processes can utilize separate CPUs, if available, thus speeding up the execution.
+participation activity
+2.2.8: Two cooperating processes yield a better design than one: A wall-building analogy.
+
+Wall
+PalletTruckFactory...........
+
+Captions
+A mason is building a wall by taking bricks one at a time from a pallet and placing them on the wall.
+The bricks are driven from a factory to the construction site in bulk, one pallet at a time.
+The mason has a dilemma: when to get the next pallet. Approach 1: wait until the current pallet is empty. Drawback: the mason is delayed at the factory until bricks are loaded.
+Approach 2: Mason goes to the factory ahead of time to request bricks but returns empty if no bricks are available. Drawback: the mason may be wasting time doing so multiple times.
+2-worker approach: Mason keeps laying bricks and only needs to stop when pallet is empty.
+A separate driver waits at the factory, takes pallet to construction, and only waits until the current pallet is empty.
+
+participation activity
+2.2.9: Benefits of the 2-process design.
+Refer to the above wall-building analogy.
+
+1)
+The 2-process design reduces the number of context switches necessary for the periodic checking of brick availability at the factory.
+2)
+The 2-process design permits the mason and the driver to operate in parallel.
+
+participation activity
+2.2.10: Extending the wall-building analogy.
+Under which condition would each extension of the 2-process solution be beneficial?
+
+How to use this tool
+Increasing the space at the construction site to hold more than 2 pallets.
+Increasing the space at the construction site to hold 2 pallets.
+Employing more than one truck.
+Beneficial if moving a pallet from the truck to the work space takes a long time.
+Beneficial if the supply of bricks from the factory is irregular, that is, long delays interspersed with bursts of production are common.
+Beneficial if the round trip between the factory and the construction site is very long.
+
+
+How was this section?
+
+|
+
+
+Provide section feedback

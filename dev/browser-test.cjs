@@ -1,0 +1,33 @@
+const assert=require('node:assert/strict');const {chromium}=require('/Users/sergiolopez/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+(async()=>{
+const browser=await chromium.launch({headless:true,executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'});try{
+const context=await browser.newContext({viewport:{width:1440,height:1100}});const p=await context.newPage();const errors=[],network=[];p.on('pageerror',e=>errors.push(e.message));p.on('request',r=>{if(/^https?:/.test(r.url()))network.push(r.url());});
+await p.goto('file:///Users/sergiolopez/Desktop/OS%20Study%20Guide/index.html');
+assert.equal(await p.locator('.guide-card').count(),14);assert.ok(Number(await p.locator('#cardCount').innerText())>=60);
+await p.selectOption('#guideTopic','Scheduling');assert.equal(await p.locator('.guide-card').count(),3);
+await p.locator('nav [data-view="cards"]').click();assert.equal(await p.locator('#flashReveal').count(),1);await p.locator('#flashReveal').click();assert.ok(await p.locator('.flash-answer').isVisible());await p.locator('#flashAgain').click();assert.ok(await p.locator('#flashReveal').isVisible());await p.locator('#flashReveal').click();await p.locator('#flashKnown').click();assert.match(await p.locator('.flash-meta').innerText(),/1 \/ /);
+await p.locator('nav [data-view="study"]').click();await p.selectOption('#studyTopic','Foundations');await p.locator('#startStudy').click();assert.ok(await p.locator('#nextQuestion').isDisabled());await p.locator('[data-answer="1"]').click();assert.ok(await p.locator('[data-answer="1"]').isDisabled());assert.ok(await p.locator('#nextQuestion').isDisabled());assert.match(await p.locator('#errorText').innerText(),/1 incorrect/);await p.locator('[data-answer="0"]').click();assert.ok(await p.locator('[data-answer="0"]').evaluate(e=>e.classList.contains('right')));assert.ok(await p.locator('#nextQuestion').isEnabled());
+await p.screenshot({path:'/private/tmp/os-practice-desktop.png'});
+// Enter should advance exactly once after clicking an answer.
+const oldId=await p.locator('#questionId').innerText();await p.keyboard.press('Enter');assert.notEqual(await p.locator('#questionId').innerText(),oldId);assert.equal(await p.evaluate(()=>session.records.length),2);
+// Keyboard numeric selection respects shuffled positions.
+const correctKey=await p.evaluate(()=>String(session.choices.findIndex(c=>c.index===session.question.correct)+1));await p.keyboard.press(correctKey);assert.ok(await p.locator('#nextQuestion').isEnabled());await p.locator('#endSession').click();assert.equal(await p.locator('#results').isVisible(),true);assert.equal(await p.locator('.metric b').nth(0).innerText(),'2');assert.equal(await p.locator('.metric b').nth(1).innerText(),'1');assert.equal(await p.locator('.metric b').nth(3).innerText(),'50.0%');
+await p.locator('#retryMissed').click();assert.equal(await p.evaluate(()=>session.bank.length),1);await p.locator('[data-answer="0"]').click();await p.locator('#nextQuestion').click();assert.match(await p.locator('#resultTitle').innerText(),/complete/);
+await p.locator('nav [data-view="timed"]').click();await p.locator('input[value="20"]').check();await p.locator('#startTimed').click();assert.match(await p.locator('#timer').innerText(),/^20:00|19:59$/);assert.ok(await p.locator('nav [data-view="guide"]').isDisabled());await p.locator('[data-answer="1"]').click();
+// Simulate a suspended/background tab whose wall-clock deadline has passed.
+await p.evaluate(()=>{session.started=Date.now()-1200001;session.deadline=session.started+1200000;tick();});assert.ok(await p.locator('#results').isVisible());assert.equal(await p.locator('.metric b').nth(0).innerText(),'0');assert.equal(await p.locator('.metric b').nth(1).innerText(),'1');assert.equal(await p.locator('.metric b').nth(3).innerText(),'0.0%');assert.equal(await p.locator('.metric b').nth(4).innerText(),'20:00');
+await p.screenshot({path:'/private/tmp/os-results-desktop.png'});
+// Full study traversal: every bank entry renders, advances only once, and reaches results.
+await p.locator('nav [data-view="study"]').click();await p.selectOption('#studyTopic','all');await p.locator('#startStudy').click();let ids=[];for(let i=0;i<104;i++){ids.push(await p.locator('#questionId').innerText());await p.locator('[data-answer="0"]').click();await p.locator('#nextQuestion').click();}assert.equal(new Set(ids).size,104);assert.ok(await p.locator('#results').isVisible());assert.equal(await p.locator('.metric b').nth(0).innerText(),'104');assert.equal(await p.locator('.metric b').nth(3).innerText(),'100.0%');
+await p.reload();await p.locator('nav [data-view="study"]').click();await p.selectOption('#studyPool','missed');assert.ok(await p.locator('#startStudy').isEnabled());
+// Mobile layout across all screens, with no horizontal page overflow.
+await p.setViewportSize({width:390,height:844});for(const view of ['guide','cards','study','timed']){await p.locator(`nav [data-view="${view}"]`).click();assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),view+' overflow');}
+await p.locator('nav [data-view="guide"]').click();await p.screenshot({path:'/private/tmp/os-guide-mobile.png'});
+await p.locator('nav [data-view="study"]').click();await p.selectOption('#studyPool','all');await p.locator('#startStudy').click();assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await p.screenshot({path:'/private/tmp/os-quiz-mobile.png',fullPage:true});await p.locator('#endSession').click();
+assert.deepEqual(errors,[]);assert.deepEqual(network,[]);
+console.log('PASS: file:// loading; zero network requests or JS errors; guide filters; flashcards/repetition; shuffled keyboard choices; wrong/correct feedback; Enter advances once; score accounting; missed retry; deadline expiry; 104-question full traversal; storage persistence; 390px responsive screens.');
+await context.close();
+// Verify local-storage denial gracefully falls back to in-memory progress.
+const c2=await browser.newContext();await c2.addInitScript(()=>{Object.defineProperty(window,'localStorage',{get(){throw new Error('disabled')}});});const p2=await c2.newPage();await p2.goto('file:///Users/sergiolopez/Desktop/OS%20Study%20Guide/index.html');await p2.locator('nav [data-view="study"]').click();await p2.locator('#startStudy').click();await p2.locator('[data-answer="0"]').click();assert.ok(await p2.locator('#nextQuestion').isEnabled());await p2.locator('#endSession').click();await c2.close();console.log('PASS: storage-disabled fallback.');
+}finally{await browser.close();}
+})().catch(e=>{console.error(e);process.exit(1)});

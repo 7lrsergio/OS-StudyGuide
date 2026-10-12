@@ -1,0 +1,180 @@
+
+2.6 Threads
+The thread concept
+An application implemented as a single process follows a single path of execution through the program. Whenever the execution blocks, waiting for some resource to become available, the entire process blocks. Many applications have parts that could run concurrently if only each could block independently. Similarly, independent parts could run in parallel on multiple CPUs.
+
+Creating a separate process for each of potentially many short-lived activities is too inefficient. A thread is an instance of executing a portion of a program within a process without incurring the overhead of creating and managing separate PCBs.
+
+Example 2.6.1: Typical uses of threads.
+A browser can draw an image on the screen while at the same time waiting for data from the Internet. One thread can be busy drawing the image while another can keep blocking while retrieving the data.
+A word processor can run a spell checker at the same time as the user is typing. Waiting for each typed character and displaying the data on the screen can be done concurrently by two separate threads.
+An Internet server, such as an email or web page server, is receiving many requests from different users at the same time. When each request is implemented as a new thread, many requests can proceed concurrently without holding up the progress of others.
+
+participation activity
+2.6.1: Multi-threaded execution of the same code.
+
+pcpccodedata
+
+Captions
+A single-threaded process has a single program counter (pc).
+The pc moves through the program as execution progresses.
+A process with multiple threads has a separate pc for each thread.
+The different pc's advance through the code independently from one another as each thread executes a different sequence of instructions within the same code.
+When multiple CPUs are available, the threads can proceed in parallel.
+
+participation activity
+2.6.2: Threads within a process.
+Multiple threads within a process _____.
+
+participation activity
+2.6.3: Threads vs processes.
+Using n threads within a single process is more efficient than using n separate processes because _____.
+
+1)
+the threads share the same code and data
+2)
+only the threads can take advantage of multiple CPUs
+3)
+only threads can block independently from one another
+
+The thread control block
+Since each thread within a process is an independent execution activity, the runtime information held in the PCB and the execution stack must be replicated for each thread. A thread control block (TCB) is a data structure that holds a separate copy of the dynamically changing information necessary for a thread to execute independently.
+
+The replication of only the bare minimum of information in each TCB, while sharing the same code, global data, resources, and open files, is what makes threads much more efficient to manage than processes.
+
+participation activity
+2.6.4: A multi-threaded process.
+
+PCBTCB1TCB2codedatastack 1stack 2...CPU_statepcspprocess_statememorypc1sp1CPU_statethread_statepc2sp2CPU_state
+...
+thread_statethread_state...MARKERMARKER
+
+Captions
+A single-threaded process has one program counter (pc) and one stack pointer (sp) as part of the CPU_state. The process_state may be running, ready, blocked.
+The CPU_state is replicated in each TCB, giving each TCB a private pc and sp.
+The process_state is replicated as a thread_state in each TCB. Thus each thread can be running/ready/blocked independently. Other fields (memory, ...) remain in PCB.
+Each thread accesses the shared code using the private pc. Each thread also has a private stack, accessed using the private sp.
+
+participation activity
+2.6.5: TCBs vs PCB.
+1)
+Threads are faster to create and destroy than processes.
+2)
+In a multi-threaded process the PCB is replaced by multiple TCBs.
+3)
+Memory and other fields are not replicated in the TCBs because the data is not needed by threads.
+
+User-level vs kernel-level threads
+Threads can be implemented completely within a user application. A thread library provides functions to create, destroy, schedule, and coordinate threads. The library maintains all TCBs within the user process. Consequently, the OS kernel is not aware of the threads and treats the process as a single-threaded execution.
+
+The alternative is to implement threads within the OS kernel. The TCBs are not directly accessible to the application, which uses kernel calls to create, destroy, and otherwise manipulate the threads.
+
+participation activity
+2.6.6: User-level vs kernel-level threads.
+
+- - - - -...CPU_state
+process_state
+ - - - - - - - - - -- - - - - - - - - - - - - - - - -- - - PCBCPUTCB1copysaveloadCPU_State
+thread_statepc1TCB2sp1pc2sp2codedatathread
+library
+stack1stack2CPU_State
+thread_statesppcthread
+functions
+- - - User-level thread managementKernel-level thread management
+
+Captions
+When the process starts running, the saved CPU_state is copied into the CPU.
+The CPU continues executing the code using the current program counter (pc) and stack pointer (sp). The PCB gets out of date as the process executes.
+Using a thread library, the application can create multiple threads, each using a different pc and different sp. All threads share the code and global data.
+The thread library switches between the threads by saving and copying the CPU_states between the TCBs and the CPU.
+With user-level threads, all thread management occurs within the user process. The kernel is not aware of the multiple threads.
+With kernel-level threads, the thread management is handled by the kernel using internal thread functions. The application uses kernel calls to request any action.
+
+participation activity
+2.6.7: Who performs a context switch.
+With a multi-threaded process, a context switch between threads is performed by the OS kernel.
+
+participation activity
+2.6.8: Process state vs thread states.
+With a multi-threaded process, each TCB maintains a separate copy of the thread state (running, ready, or blocked) but the PCB must also have a copy of the process state (running, ready, or blocked).
+
+Combining user-level and kernel-level threads
+Advantages of user-level threads (ULTs) over kernel-level threads (KLTs):
+
+Because ULTs do not require any cooperation from the kernel, ULTs are much faster to manage (create, destroy, and schedule) and thus many more can be created than KLTs.
+Applications using ULTs are portable between different OSs without modifications.
+Main disadvantages of ULTs over KLTs:
+
+ULTs are not visible to the kernel. When one ULT blocks, the entire process blocks, which decreases concurrency and thus the performance and responsiveness of the application.
+ULTs cannot take advantage of multiple CPUs because the process is perceived by the kernel as a single thread of execution.
+Many modern OSs take a combined approach. The kernel supports a small number of KLTs. Each application can implement any number of ULTs, which are then mapped on the KLTs based on the ULTs' needs and the available resources.
+
+participation activity
+2.6.9: Mapping user-level threads on kernel-level threads.
+
+u1u2u3u4process1User-level
+ threadsprocess2. . .Kernel-level
+  threads
+Processorsk1k2k3CPU1CPU2- - - - - - - - - - - - - - - - - - - -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -- - - - - - - - - - - - - - - - - - -
+
+Captions
+The kernel maintains a small number of KLTs. The kernel also schedules the KLTs on the available CPUs.
+Each process can create any number of ULTs using a thread library.
+The programmer decides which ULTs or groups of ULTs are mapped on separate KLTs.
+When u1 blocks, k1 blocks as well. But as long as at least one of u2, u3, or u4 is running, the process continues running in k2.
+When u1 runs again and one of u2, u3, or u4 continues running then the process may continue in parallel on both CPUs.
+
+participation activity
+2.6.10: Mapping ULTs on KLTs.
+A process consisting of n ULTs is to be mapped onto a set of m KLTs. Which combination would not fully utilize available resources?
+
+participation activity
+2.6.11: Kernel calls for threads.
+Kernel calls are _____ to manage threads.
+
+Exercise
+2.6.1: Single-threaded vs multi-threaded computation.
+
+A server accepts and processes requests from clients. The server keeps the results of the most recent requests in memory as a cache.
+
+A new request arrives on average every 25 ms.
+The processing of each request takes 15 ms.
+If the requested result is not in the memory cache, additional 75 ms are needed to access the disk.
+On average, 80% of all requests can be serviced without disk access.
+The creation of a new thread takes 10 ms.
+(a)
+Should the server be implemented as a single-threaded or a multi-threaded process? Justify your answer.
+
+(b)
+What percentage of requests would have to be satisfied without disk access for the single-threaded approach to be feasible?
+
+
+Exercise
+2.6.2: Process state vs thread states.
+
+(a)
+When a process implements ULTs, each TCB maintains a separate thread_state field but the process must also maintain a process_state field in the PCB since the kernel is not aware of the TCBs.
+Which of the following combinations of process state and thread states could occur?
+
+PCB	TCB1	TCB2
+1	blocked	ready	ready
+2	ready	running	ready
+3	blocked	blocked	blocked
+4	running	running	running
+5	ready	ready	blocked
+6	running	running	blocked
+7	running	running	ready
+
+Exercise
+2.6.3: Replicated scheduling information.
+
+(a)
+In a process with ULTs, what would be the advantage of replicating the scheduling_information field from the PCB into every TCB?
+
+
+How was this section?
+
+|
+
+
+Provide section feedback

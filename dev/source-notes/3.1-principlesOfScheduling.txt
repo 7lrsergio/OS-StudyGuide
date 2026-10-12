@@ -1,0 +1,188 @@
+
+3.1: Principles of scheduling
+
+
+Activities:
+P
+Participation
+Due: 09/10/2026, 11:59 PM CDT
+3.1 Principles of scheduling
+Long-term vs short-term scheduling
+Scheduling decisions are made at two different levels.
+
+Long-term scheduling decides when a process should enter the ready state and start competing for the CPU.
+Short-term scheduling decides which of the ready processes should run next on the CPU.
+participation activity
+3.1.1: Long-term vs short-term scheduling.
+
+RLCPU Create
+processprocesses
+Long-term
+schedulingShort-term
+schedulingNewWaiting
+  listSuspended
+      list
+
+Captions
+Processes are created at unpredictable times and enter the system with the process state: new.
+Long-term scheduling decides which processes are moved to the ready list (RL) to compete for the CPU.
+Processes are also subject to long-term scheduling when suspended and later reactivated by the OS.
+Short-term scheduling moves processes between the ready list and the CPU.
+When a running process becomes blocked and later reenters the RL, short-term scheduling is again applied to let the process compete for the CPU.
+
+participation activity
+3.1.2: Scheduling frequency.
+Long-term scheduling takes place ________ short-term scheduling.
+
+participation activity
+3.1.3: Long-term vs short-term scheduling.
+A process can move to the ready list (RL) from different locations.
+
+1)
+A process entering the RL from a list of new processes is subject to ________.
+2)
+A process entering the RL from the suspended list is subject to ________.
+3)
+A process entering the RL from the waiting list is subject to ________.
+4)
+A process entering the RL from the CPU is subject to ________.
+
+Preemptive vs non-preemptive scheduling
+A non-preemptive scheduling algorithm allows a running process to continue until the process terminates or blocks on a resource.
+
+A preemptive scheduling algorithm may stop the currently running process and choose another process to run. The decision is made whenever:
+
+A new process enters the ready list (RL).
+A previously blocked or suspended process re-enters the RL.
+The OS periodically interrupts the currently running process to give other processes a chance to run.
+participation activity
+3.1.4: Non-preemptive vs preemptive scheduling.
+
+p1p2t1t2t4- - - - - - - - - - - - - - - - -- - - - - - - - - - - - - - - - -- - - - - - - - - - - - - - - - - - - - - - p1p2- - - - - - - - - - - t1t2t3Non-preemptive schedulingPreemptive scheduling
+
+Captions
+Process p1 arrives at time t1 and starts executing.
+A second process p2 arrives at time t2.
+Under a non-preemptive algorithm, p1 continues while p2 waits.
+p2 starts when p1 terminates at time t3.
+Under a preemptive algorithm, p1 stops at time t2.
+If p2 is chosen to run next, p1 needs to wait until time t4 to continue.
+
+participation activity
+3.1.5: Scheduling decisions under non-preemptive scheduling.
+A non-preemptive algorithm makes a scheduling decision whenever _____.
+
+1)
+a new process arrives in the RL
+2)
+a process changes from the blocked state to the ready state
+3)
+a process requests an unavailable resource
+4)
+a process terminates
+
+participation activity
+3.1.6: Scheduling decisions under preemptive scheduling.
+A preemptive algorithm makes a scheduling decision whenever _____.
+
+1)
+a new process arrives in the RL
+2)
+a process changes from the blocked state to the ready state
+3)
+a process requests an unavailable resource
+4)
+a process terminates
+
+Priority for short-term scheduling
+The priority of a process (or thread) is a numerical value that indicates the importance of the process relative to other processes. The scheduler uses this value to decide which process to run next.
+
+The priority can be a constant value assigned when the process is created or can change dynamically based on some combination of the following parameters.
+
+The arbitration rule decides which process should proceed if two or more processes have the same priority.
+
+Table 3.1.1: Common parameters used to compute short-term priority.
+Parameter	Explanation
+Arrival	The point in time when the process enters the RL.
+Departure	The point in time when the process leaves the RL by entering the blocked or suspended state, or by terminating all work.
+Attained CPU time	The amount of CPU time used by the process since arrival.
+Real time in system	The amount of actual time the process has spent in the system since arrival.
+Total CPU time	The amount of CPU time the process will consume between arrival and departure. For short-term scheduling, total CPU time is sometimes called the CPU burst.
+External priority	A numeric priority value assigned to the process explicitly at the time of creation.
+Deadline	A point in time by which the work of the process must be completed.
+Period	A time interval during which a periodically repeating computation must be completed. The end of each period is the implicit deadline for the current computation.
+Other considerations	The resource requirements of a process, such as the amount of memory used, or the current load on the system.
+
+participation activity
+3.1.7: Changes in the time-related parameters.
+For a process in the ready state, the _________ keeps increasing.
+
+participation activity
+3.1.8: The meaning of the priority parameters.
+1)
+A weather forecasting application is an example of a system with a deadline.
+2)
+A video streaming application is an example of a periodic process.
+3)
+The external priority is recorded in a process's PCB.
+
+Priority for long-term scheduling
+Long-term scheduling, which decides when a new process should enter the RL, also uses the concept of priority. Long-term priority can be based on the same parameters as short-term priority: arrival, departure, attained CPU time, real time in the system, total CPU time, and external priority. However, long-term scheduling occurs much less frequently than short-term scheduling and thus the decisions are made at a higher granularity of time.
+
+Arrival is the time of process creation.
+Departure is the time of process destruction.
+Consequently, the attained CPU time and the total CPU time have different meanings in short-term and long-term scheduling.
+
+participation activity
+3.1.9: Parameters for short-term and long-term priority.
+
+Arrival/DepartureShort-termArrival/DepartureLong-termAttained CPU timeAttained CPU time- - - - - - - - - - - - - - - - - - - - - - - - - current timeReal timeReal timeTotal CPU timeTotal CPU timenewreadyrunningblockedreadyrunningreadyrunningblocked...terminated
+
+Captions
+A process goes through a series of state transitions starting from new and ending in terminated.
+For short-term scheduling, each arrival is a transition into ready state (entering RL) and each departure is a transition into blocked state (leaving RL).
+For long-term scheduling, arrival is the creation of the process (entering new) and departure is the destruction of the process (leaving terminated).
+The attained CPU time accumulates between arrival and departure while the process is running.
+For short-term scheduling, the attained CPU time restarts with each arrival and keeps accumulating until the current time.
+For long-term scheduling, the attained CPU time keeps accumulating since the process's creation until the current time.
+The real time for short-term scheduling starts with each arrival and accumulates until the current time regardless of the process's state (running or ready).
+The real time for long-term scheduling starts with the process creation and accumulates until the current time regardless of the process's state (running, ready, or blocked).
+The total CPU time is the accumulation of all CPU times (running state) from arrival to departure. For short-term scheduling the accumulation restarts with each new arrival.
+Long-term scheduling has only a single arrival. Thus the total CPU time is the accumulation of all CPU times (running states) from process arrival to process termination.
+
+participation activity
+3.1.10: Arrival/departure vs creation/destruction.
+Arrival/departure times correspond to process creation/destruction in _________ scheduling.
+
+participation activity
+3.1.11: Attained and total CPU times under long-term and short-term scheduling.
+A process p starts running at time 0, becomes blocked at time 2, and starts running again at time 5.
+
+1)
+p's attained CPU time under short-term scheduling at time 6 will be ______ time units.
+
+    
+
+
+Show answer
+2)
+p's attained CPU time under long-term scheduling at time 6 will be ______ time units.
+
+    
+
+
+Show answer
+3)
+If p terminates at time 7, the total CPU time under long-term scheduling will be ______ time units.
+
+    
+
+
+Show answer
+
+How was this section?
+
+|
+
+
+Provide section feedback

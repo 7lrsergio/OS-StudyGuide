@@ -1,0 +1,366 @@
+
+3.2: Scheduling of batch processes
+
+Activities:
+P
+Participation
+Due: 09/10/2026, 11:59 PM CDT
+3.2 Scheduling of batch processes
+A batch process performs a long-running and generally repetitive task that does not require any intervention from the user. Ex: Payroll, insurance claims processing, weather prediction, scientific calculations.
+
+In the early days of computing, batch processing referred to submitting multiple computations, known as jobs, to be executed as a "batch" without manual intervention. In modern computing, any long-running computation that does not require interaction with a user is called a batch job or batch process.
+FIFO scheduling algorithm
+The FIFO (First-In-First-Out) algorithm, also known as FCFS (First-Come-First-Served), schedules processes strictly according to the process arrival time. The earlier the arrival, the higher the priority. Theoretically, multiple processes could have the same arrival time, in which case the arbitration rule can pick a process at random. In practice, all requests are processed sequentially and thus all processes have different arrival times.
+
+FIFO is non-preemptive.
+
+participation activity
+3.2.1: Execution under FIFO scheduling.
+
+012345678910timep1p2p311
+ and will need 6 units of CPU time. p2 arrives at 
+ and will need 3 units. p3 arrives at 
+ and will need 2 units. The time line and 3 unfilled bars appear, one for each process. The length of each bar corresponds to the needed CPU time. Each bar starts at the arrival point, thus the bars are overlapping in time. Step 2: p1 arrived first and starts immediately at 
+. The bar for p1 is filled from time 0 to 6. The bars for p2 and p3 remain unfilled. Step 3: p2 arrived second and will start as soon as p1 terminates at 
+. p1 bar remains filled from time 0 to 6, p2 bar shifts right and is filled from time 6 to 9, following p1's termination. The bar for p3 remains unfilled. Step 4: p3 is the last arriving process and will start when p2 terminates at 
+. Filled bars for all three processes, with p1 from time 0 to 6, p2 from time 6 to 9, and p3 shifting to the right and filled from time 9 to 11, showing the sequential execution of the processes.
+
+Captions
+Three processes need to be scheduled. p1 arrives at t = 0 and will need 6 units of CPU time. p2 arrives at t = 1 and will need 3 units. p3 arrives at t = 3 and will need 2 units.
+p1 arrived first and starts immediately at t = 0.
+p2 arrived second and will start as soon as p1 terminates at t = 6.
+p3 is the last arriving process and will start when p2 terminates at t = 9.
+
+participation activity
+3.2.2: FIFO scheduling.
+Determine the start times of the following processes:
+
+Process	Arrival time	Total CPU time
+p1	0	5
+p2	3	1
+p3	2	4
+1)
+Start of p1
+
+    
+
+
+Show answer
+2)
+Start of p2
+
+    
+
+
+Show answer
+3)
+Start of p3
+
+    
+
+
+Show answer
+
+SJF scheduling algorithm
+The SJF (Shortest Job First) algorithm, also known as SJN (Shortest Job Next), schedules processes according to the total CPU time requirements. The shorter the required CPU time, the higher the priority. If multiple processes have the same CPU time requirement, then the arbitration rule can select a process based on the arrival times.
+
+SJF is non-preemptive.
+
+A more appropriate name for SJF would be "Shortest Total CPU Time First". For historical reasons, the term "Job" has remained in common use.
+participation activity
+3.2.3: Execution under SJF scheduling.
+
+01234567891011timep1p2p3
+
+Captions
+Three processes need to be scheduled. p1 arrives at t = 0 and will need 6 units of CPU time. p2 arrives at t = 1 and will need 3 units. p3 arrives at t = 3 and will need 2 units.
+p1 arrived first and starts immediately at t = 0.
+p3 has a shorter total CPU time requirement than p2 and will start as soon as p1 terminates at t = 6.
+p2 starts when p3 terminates at t = 8.
+
+participation activity
+3.2.4: SJF scheduling.
+Determine the start times of the following processes:
+
+Process	Arrival time	Total CPU time
+p1	0	5
+p2	3	1
+p3	2	4
+1)
+Start of p1
+
+    
+
+
+Show answer
+2)
+Start of p2
+
+    
+
+
+Show answer
+3)
+Start of p3
+
+    
+
+
+Show answer
+
+SRT scheduling algorithm
+The SRT (Shortest Remaining Time) algorithm schedules processes according to the remaining CPU time needed to complete the work. The shorter the remaining CPU time, the higher the priority. If multiple processes have the same remaining time requirement, then the arbitration rule can select a process based on the arrival times.
+
+SRT is the preemptive version of SJF.
+
+participation activity
+3.2.5: Execution under SRT scheduling.
+
+01234567891011timep1p2p3- - - - - - - - - - - - - - - - - - - - - - - - 
+
+Captions
+Three processes need to be scheduled. p1 arrives at t = 0 and will need 6 units of CPU time. p2 arrives at t = 1 and will need 3 units. p3 arrives at t = 3 and will need 2 units.
+p1 arrives first and starts immediately at t = 0.
+p2 arrives at t = 1. p2's remaining time is 3 units while p1's remaining time is 5 units. Thus p2 preempts p1 and starts at t = 1.
+p3 arrives at t = 3. p3's remaining time is 2 units while p2's remaining time is only 1 unit. Thus p2 continues running until t = 4.
+At t = 4, p1's remaining time is 5 units and p3's remaining time is 2 units. Thus p3 starts and runs until t = 6.
+Finally, p1 restarts at t = 6 and terminates at t = 11.
+
+participation activity
+3.2.6: Determining the remaining time.
+The remaining time of a process depends on _________.
+
+1)
+arrival and departure times
+2)
+total CPU time
+3)
+real time in system
+4)
+attained CPU time
+
+participation activity
+3.2.7: SRT scheduling.
+Determine the start and end times of the following processes:
+
+Process	Arrival time	Total CPU time
+p1	0	5
+p2	3	1
+p3	2	4
+1)
+Start of p1
+
+    
+
+
+Show answer
+2)
+End of p1
+
+    
+
+
+Show answer
+3)
+Start of p2
+
+    
+
+
+Show answer
+4)
+End of p2
+
+    
+
+
+Show answer
+5)
+Start of p3
+
+    
+
+
+Show answer
+6)
+End of p3
+
+    
+
+
+Show answer
+
+Estimating total CPU time
+For long-term scheduling the total CPU time is measured between the process creation and process destruction. The time can be estimated from previous runs of the same program or may be supplied by the programmer.
+
+For short-term scheduling, the total CPU time (CPU burst) changes for each arrival/departure period. The total CPU time is not known in advance but can be estimated based on past behavior. The most common approach uses exponential averaging, which combines the last estimate of the total CPU time, , with the last actually observed total CPU time, , to predict the next total CPU time, :
+
+ controls the relative weight of the last observation () versus the history of past predictions ().
+
+Figure 3.2.1: Predicting total CPU time with  = 0.8 and  = 0.2.
+With a large value of  (left diagram), each prediction is based mostly on the last observed value, . The advantage is that the predictions adapt quickly to any changes. Ex: At time 15, the prediction curve rises immediately with the observed values. The disadvantage is that the predictions also follow any outliers, resulting in erratic behavior. Ex: The single spike in observed behavior at time 8 is followed by a similar spike in predicted behavior.
+
+With a small value of  (right diagram), each prediction is based mostly on the weighted history of past predictions, . The advantage is that the predictions ignore outliers but adapt more slowly to changes. Ex: The single spike at time 8 is largely ignored. The disadvantage is that the prediction curve rises slowly from time 15 to 25 to catch up with the observed values.
+
+Left diagram shows observed vs. predicted total CPU time for α = 0.8. The predictions follows closely the observed values. Right diagram shows observed vs. predicted total CPU time for α = 0.2. The predictions ignore outliers but lag behind the observed curve.
+
+participation activity
+3.2.8: Predicting the next total CPU time.
+Determine the predicted value  for , , and _________.
+
+1)
+
+    
+
+
+Show answer
+2)
+
+    
+
+
+Show answer
+
+participation activity
+3.2.9: Choosing .
+1)
+What should be the value of  so that each prediction is based solely on the last observation?
+
+    
+
+
+Show answer
+2)
+What should be the value of  so that each prediction is based equally on the last observation and last prediction?
+
+    
+
+
+Show answer
+
+Performance of the algorithms
+The main objective in scheduling batch processes is to maximize the number of processes completed per unit of time. The order in which processes are executed cannot reduce the total CPU times of the individual processes but can reduce the waiting times. The turnaround time of a process is the time between arrival and departure, and is the sum of the total CPU time and the waiting time. The average turnaround time (ATT) for a set of n processes is the mean of the n individual turnaround times.
+
+Another important objective is to guarantee fairness. Starvation is the indefinite postponement of a process while other processes are allowed to proceed. Both SJF and SRT can lead to starvation.
+
+participation activity
+3.2.10: ATT for different scheduling algorithms.
+
+01234567891011timep1p2p3p1p2p3- - - - - - - - - - - -- - - - - - - - - - - -- -- - - - - - - - - - - - - -- - - - - - - - - - - - - -- -FIFOp10+6p2p35+3ATT6+222/3=7.33p1p2p3- - - - - - - - - - - - - - - -- - - - - - - - - - - - - - - -- -- - - - - - -- - - - - - -- -SJFp10+6p2p37+3ATT3+221/3=7p1p2p3- - - - - - - - - - - -- - - - - - - - - - - -SRTp15+6p2p30+3ATT1+217/3=5.66- - -- -- - -
+
+Captions
+p1 arrives at time 0 and will need 6 units of CPU time. p2 arrives at time 1 and will need 3 units of CPU time. p3 arrives at time 3 and will need 2 units of CPU time.
+Under FIFO, all processes start and terminate in the order of arrival.
+p1 starts with 0 waiting time and runs for 6 units. p2 waits for 5 units and runs for 3 units. p3 waits for 6 units and runs for 2 units. Average turnaround time = 7.33.
+Under SJF, p1 starts since no other process has arrived yet. p3 is shorter than p2 and thus runs before p2.
+The turnaround time for p1 is 6 under SJF. But p3 waits 3 units less while p2 waits only 2 units more. The ATT is reduced to 7.
+The arrival of new processes of length less than 3 (the length of p2) prior to time 8 could lead to an indefinite postponement (starvation) of p2.
+Under SRT, p1 is interrupted by p2 and both p2 and p3 complete before p1 resumes.
+Compared to SJF, p2's waiting time is reduced by 7 and p3's waiting time is reduced by 2. p1's waiting time is increased by only 5, which reduces the ATT to 5.66.
+The arrival of new processes of length less than 5 (the remainder of p1) prior to time 6 could lead to an indefinite postponement (starvation) of p1.
+
+participation activity
+3.2.11: Computing ATT.
+Process p1 arrives at time 0 and will need 100 units of CPU time. Process p2 arrives at time 1 and will need 1 unit of CPU time.
+
+1)
+The ATT under FIFO will be _________ time units.
+
+    
+
+
+Show answer
+2)
+The ATT under SJF will be _________ time units.
+
+    
+
+
+Show answer
+3)
+The ATT under SRT will be _________ time units.
+
+    
+
+
+Show answer
+
+participation activity
+3.2.12: Processes with equal length.
+If processes have exactly the same total CPU time requirement, then _________
+
+1)
+FIFO and SJF yields the same ATT.
+2)
+SJF and SRT also yield the same ATT.
+3)
+SJF and SRT could lead to starvation.
+
+challenge activity
+3.2.1: Scheduling of batch processes.
+764382.5329120.qx3zqy7
+Three processes are shown. Fill in the missing values using FIFO scheduling.
+Process	Arrival time	Total CPU time	Start time	End time
+p1	0	6		
+p2	2	3		
+p3	1	4		
+Ex: 9
+1
+2
+3
+4
+5
+1
+2
+3
+4
+5
+
+Exercise
+3.2.1: Scheduling with FIFO, SJF, and SRT.
+
+(a)
+For the 5 processes described below, draw a timing diagram showing when each process executes under FIFO, SJF, and SRT.
+
+
+Process	p1	p2	p3	p4	p5
+Arrival time	0	2	4	6	8
+Total CPU time	3	6	4	5	2
+(b)
+Determine the ATT for each scheduling algorithm for the 5 processes.
+
+
+Exercise
+3.2.2: Scheduling with FIFO, SJF, and SRT.
+
+(a)
+Starting at time 0, a new process p of length 3 arrives every 4 time units.
+Starting at time 1, a new process q of length 1 arrives every 4 time units.
+Determine the ATT under FIFO, SJF, and SRT.
+
+
+Exercise
+3.2.3: Predicting CPU bursts.
+
+The following sequence of CPU bursts has been observed: 7, 5, 6, 15, 15, 15.
+
+(a)
+Using 7 as the initial estimate, , generate the sequence of predictions, , for the corresponding observed values, , where  and .
+
+(b)
+Repeat the same predictions for .
+
+
+Exercise
+3.2.4: Impact of past history on total CPU time estimates.
+
+(a)
+Assume that  and . The next prediction, , is based on  and all past values of . Determine the contribution (in %) of each  to .
+
+
+How was this section?
+
+|
+
+
+Provide section feedback

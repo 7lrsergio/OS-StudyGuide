@@ -1,0 +1,295 @@
+
+2.3 The process control block
+Contents of the PCB
+The PCB is the instantiation (embodiment) of a process. Upon creation, the OS assigns every process a unique identifier. This identifier, p, could be a pointer to the PCB structure or an index into an array of PCBs.
+
+The specific implementation and the contents of a PCB vary between different OSs but the following is a generic structure representative of most modern OSs.
+
+Table 2.3.1: A generic PCB of process p.
+PCB field	Explanation
+CPU_state	When p is stopped, the current state of the CPU, consisting of various hardware registers and flags, is saved in this field. The save information is copied back to the CPU when p resumes execution.
+process_state	Stores p's current state. Ex: Running, ready, or blocked.
+memory	Describes the area of memory assigned to p. In the simplest case the field would point to a contiguous area of main memory. In systems using virtual memory (discussed elsewhere) the field could point to a hierarchy of memory pages or segments.
+scheduling_information	Contains information used by the scheduler to decide when p should run. The information typically records p's CPU time, the real time in the system, the priority, and any possible deadlines.
+accounting_information	Keeps track of information necessary for accounting and billing purposes. Ex: The amount of CPU time or memory used.
+open_files	Keeps track of the files currently open by p.
+other_resources	Keeps track of any resources, such as printers, that p has requested and successfully acquired.
+parent	Every process is created by some other running process. The parent process of a process p is the process that created p. The parent field records the identity of p's parent.
+children	A child process c of process p is a process created by p. Process p is c's parent. The identity of every child process c of p is recorded in the children field.
+
+participation activity
+2.3.1: Possible changes to PCB.
+Indicate which PCB fields may change during a process's lifetime.
+
+1)
+CPU_state
+2)
+process_state
+3)
+memory
+4)
+open_files
+5)
+children
+
+participation activity
+2.3.2: Runtime changes to PCB.
+Indicate which PCB fields may change while a process is in the running state.
+
+1)
+CPU_state
+2)
+process_state
+3)
+open_files
+4)
+parent
+5)
+children
+
+The PCB data structure
+The entries of a PCB are composed of different data types, including integers, characters, or pointers. Consequently, each PCB is implemented as a heterogeneous data structure. Ex: "struct" in the C language.
+participation activity
+2.3.3: Composition of the PCB.
+
+Set of integersInteger or charPointersSet of integersSet of integersStart of linked listStart of linked listPointer or indexStart of linked listCPU_stateprocess_statememoryscheduling informationaccounting_informationopen_filesother_resourcesparentchildren. . .Pointers to resources
+Pointers to PCBs. . .. . .
+
+Captions
+An empty PCB structure is created for a new process.
+Some fields are represented as sets of integers. Ex: The CPU_state contains copies of CPU registers. The scheduling_information has the priority and other data.
+The process_state encodes the possible states, such as ready, running, or blocked, using most likely integers or characters.
+The memory field contains one or more pointers (memory address) and the parent field designates the parent process using a pointer or array index.
+The open_files field is a pointer to a linked list of open files where each list element points to one open file.
+The remaining two fields are also pointers to linked lists. One is the list of other resources held by the process and the other is a list of child processes.
+
+participation activity
+2.3.4: Minimizing the process_state field.
+1)
+What would be the most space-efficient data type to represent the process_state in C?
+
+    
+
+
+Show answer
+2)
+What is the minimum number of bits needed to represent the process_state field, if 3 states are supported: running, ready, and blocked?
+
+    
+
+
+Show answer
+3)
+What is the minimum number of bits needed to represent the process_state field, if 6 states are supported: running, ready, blocked, new, suspended, and terminated?
+
+    
+
+
+Show answer
+
+participation activity
+2.3.5: Reducing the PCB.
+The PCB data structure could be reduced if a process could generate only one child at a time.
+
+Organizing PCBs
+The OS must allocate and deallocate PCBs efficiently as processes are created and destroyed. Two ways exist to organize all PCBs:
+
+An array of structures. The PCBs are marked as free or allocated, which eliminates the need for any dynamic memory management. The main drawback is a lot of wasted memory space to maintain a sufficient number of PCB slots.
+An array of pointers to dynamically allocated PCBs. The pointer array wastes little space and can be made much larger than the array of structures. The drawback is the overhead of dynamic memory management to allocate each new PCB and to free the memory when the process terminates.
+participation activity
+2.3.6: Allocating and deallocating PCBs.
+
+PCBPCBPCB............PCB012242526012242526
+
+Captions
+With an array of structures, each slot contains either a PCB (orange) or is marked as free (green).
+Allocating a new PCB involves selecting a free slot (26) and filling the new PCB's entries. No dynamic memory allocation takes place.
+With an array of PCB pointers, each entry points to a PCB structure (orange) or is marked as free (green).
+To allocate a new PCB requires first the dynamic creation of the new data structure. Next, a free slot in the array is located (26) and made to point to the new PCB.
+To destroy a PCB in the array implementation, the array slot is simply marked as free.
+To destroy a PCB with the array of PCB pointers, the PCB structure must be freed and the corresponding pointer entry marked as free.
+
+participation activity
+2.3.7: PCB implementation options.
+The set of all PCBs could be implemented as a ________
+
+participation activity
+2.3.8: Reducing overhead of PCB management.
+When PCBs are allocated and freed dynamically, the overhead of the dynamic memory management could be reduced by reusing PCBs of destroyed processes.
+
+participation activity
+2.3.9: Space-efficiency in PCB reuse.
+Reusing PCBs of destroyed processes rather than freeing the data structures is more time-efficient __________.
+
+Avoiding linked lists
+Linked lists require dynamic memory management, which is costly. The Linux OS has pioneered an approach that eliminates this overhead.
+
+Instead of a separate linked list anchored in the parent's PCB, the links are distributed over the child PCBs such that each points to the immediate younger sibling and immediate older sibling. The original 2 fields, parent and children, in the PCB of a process p are replaced by 4 new fields:
+
+parent: points to p's single parent as before
+first_child: points to p's first child
+younger_sibling: points to the sibling of p created immediately following p
+older_sibling: points to the sibling of p created immediately prior to p
+This implementation requires no dynamic memory management.
+
+participation activity
+2.3.10: Avoiding a linked list implementation.
+
+os01
+5
+2
+3
+4
+pppppccccc01
+5
+2
+3
+4
+ysysysososccpppppImplementation using linked listsImplementation without linked lists
+
+Captions
+Process 0 has 3 children (1, 2, 3). A child pointer (c) points from 0's linked list to each child. Each child has a parent pointer (p) to 0. Process 2 has 1 child (4) linked to 2 in an analogous manner.
+In the list-free implementation, all children point to the parent as before (p) but the parent points only to the first child (c)
+Instead of the separate linked list, all child processes are linked to each other using the younger sibling (ys) and older sibling (os) links.
+To add a new child under the linked-list implementation, a new link is dynamically created to point to the new PCB (5) and the PCB is linked to the parent (2).
+To add a new child (5) under the list-free implementation, only the older sibling (4) is modified to point to the new younger sibling (5). No dynamic memory allocation takes place.
+
+participation activity
+2.3.11: Representing parent/child relationships.
+The list-free implementation requires ______ fields in the PCB instead of 2 to represent the parent/child relationships.
+
+    
+
+
+Show answer
+
+participation activity
+2.3.12: Efficiency of avoiding linked lists.
+1)
+The list-free implementation is ________ the linked-list implementation.
+2)
+Adding a new child process with the list-free implementation uses _____ the linked-list implementation.
+
+challenge activity
+2.3.1: Avoiding linked lists.
+764382.5329120.qx3zqy7
+The following diagram shows the parent-child relationships among three processes.Diagram of the parent-child relationships among three processes. Process 8 has 2 children (1, 3). A child pointer (c) points from 8's linked list to each child. Each child has a parent pointer (p) to process 8.Linked lists can be avoided by implementing two additional pointers, younger sibling (ys) and older sibling (os), in each PCB.Complete the table by showing which field points to which process using the four different pointers. If an entry is unknown, enter "-".813
+8	1	3
+p			
+c			
+ys			
+os			
+Ex: 10
+1
+2
+3
+4
+5
+1
+2
+3
+4
+5
+
+Managing PCBs
+The OS maintains all PCBs organized on various lists. A waiting list is associated with every resource and contains all processes blocked on that resource because the resource is not available. Another important list is the ready list (RL): A list containing all processes that are in the ready state and thus are able to run on the CPU. The RL also includes the currently running process. The RL maintains all processes sorted by their importance, which is expressed by an integer value called the priority. The RL can be a simple linked list where the priority of a process is the current position in the list. The RL can also maintain processes in different lists sorted by priorities.
+
+participation activity
+2.3.13: RL as a priority list.
+
+7
+6
+5n
+0......RunningPointers to PCBs
+
+Captions
+An RL consisting of priorities 0 through n currently contains processes at levels 0, 5, and 7. The highest priority process (level 7) is running.
+A new process at priority 5 is entered into the RL. Process at level 7 continues to run.
+When a new process is entered at a priority above 7 then the currently running process (level 7) turns from running to ready and the new process starts to run.
+
+participation activity
+2.3.14: Ranges of priorities.
+With RL implemented as a priority list, the range of priorities is [n1:n2], where n1 and n2 can be:
+
+1)
+n1 = 0, n2 > 0
+2)
+n1 = 0, n2 = 0
+3)
+n1 < 0, n2 > 0
+
+participation activity
+2.3.15: RL for multiple CPUs.
+A single RL could not be used with multiple CPUs.
+
+Exercise
+2.3.1: Creation hierarchy without linked lists.
+
+Processes 0-4 are related as follows: 1, 2, 3 are children of 0, and 4 is a child of 2. PCBs are implemented as an array indexed by the process number. Each PCB has the links: parent (p), first child (c), younger sibling (ys), and older sibling (os).
+
+(a)
+Complete the PCB array to show the values of the 4 links (p, c, ys, os) for all processes, to reflect the parent-child hierarchy.
+
+Matrix. X-axis labeled 0 - 5. Y-axis labeled '...' p c ys os. Matrix contents: row '...' contains all '...'. Remaining rows are empty.
+(b)
+Modify the array to reflect the creation of a new child, 5, of process 2.
+
+
+Exercise
+2.3.2: RL without linked lists.
+
+The RL can be implemented without dynamically managed linked lists by creating a new field, next, in each PCB, which points to the next PCB on the same list. Each entry of the RL then points to the first PCB on the list.
+
+(a)
+Assume that RL contains 3 processes at level 5 and 1 process at level 0. Draw a diagram showing the RL and the modified PCBs.
+
+
+Exercise
+2.3.3: A modified implementation of PCBs.
+
+Implementing the PCBs as an array is more efficient than using dynamic memory allocation. The drawback is that the array size must be kept relatively small. To overcome this drawback, the PCBs are implemented as fixed size array, PCB[n], where n is large enough most of the time. In the case where more processes need to be created, the array size n is temporarily extended to accommodate the spike. The extension is removed when the number of elements falls again below n. To compare the effectiveness of this scheme with a dynamic linked list implementation, assume the following values:
+
+s is the time to perform one insert or remove operation in a linked list
+r is the time to perform one insert or remove operation in the array
+o is the overhead time to temporarily extend the array
+p is the probability that any given insert operation will overrun the normal array size n
+(a)
+Derive a formula for computing the value of p, below which the proposed scheme will outperform the linked list implementation.
+
+(b)
+Compute the value of p when s = 10r and o = 100r.
+
+
+Exercise
+2.3.4: Trade-offs of PCB reuse.
+
+Reusing PCBs of destroyed processes instead of freeing up the data structures eliminates the overhead of dynamic memory management but is likely to use more memory.
+
+Assume the following:
+
+The number of processes to be created and destroyed over a period of time is 10,000.
+The average number of processes coexisting at any given time is 100.
+The maximum number of processes coexisting at any given time is 600.
+Allocating and freeing a PCB take the same amount of time.
+(a)
+How many memory operations (allocate or free) will be performed without PCB reuse?
+
+(b)
+How many memory operations (allocate or free) will be performed with PCB reuse?
+
+(c)
+How many PCBs will coexist in memory, on average, during the entire run without PCB reuse?
+
+(d)
+How many PCBs will coexist in memory, on average, during the entire run with PCB reuse?
+
+(e)
+What could be done to reduce the much larger number of PCBs maintained in memory when PCBs are reused?
+
+
+How was this section?
+
+|
+
+
+Provide section feedback

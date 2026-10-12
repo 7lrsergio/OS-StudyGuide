@@ -1,0 +1,124 @@
+
+3.5: Combined approaches
+
+Activities:
+P
+Participation
+Due: 09/10/2026, 11:59 PM CDT
+3.5 Combined approaches
+An OS running only batch processes or only real-time processes could rely on only one of the suitable algorithms. Ex: SJF for a batch OS and EDF for a real-time OS. A general-purpose OS needs to handle different types of processes and thus a combination of different scheduling algorithms must be used.
+
+A 2-tier approach
+The simplest approach is to divide processes into two groups. Real-time processes run at the highest priority level but due to their short running times can use FIFO. Interactive and batch processes can be scheduled together using MLF.
+participation activity
+3.5.1: A 2-tier scheduling scheme.
+
+  Priority
+  levelCPU...K-1K-21...NK......ML: FIFOML: RRMLF- - - - -Real-time
+processesBatch/interactive
+    processesN-1r1r2r3r4r5pq
+
+Captions
+Real-time processes are scheduled using ML. The shortest processes may use FIFO, longer processes time-share the CPU using RR.
+Batch and interactive processes use MLF.
+The shortest real-time processes enter at fixed priority levels in the ML scheme and use FIFO at each level. Processes r1 and r2 are processed before r3.
+Longer real-time processes also enter at fixed priority levels but use RR at each level to distribute the CPU time evenly among the processes.
+Batch and interactive processes always enter at level K-1 and, using MLF, gradually descend to lower levels based the total CPU time required.
+
+participation activity
+3.5.2: Processes of different types enter at different priority levels.
+In the 2-tier scheduling scheme the priority levels [1 : K-1] are used for interactive and batch processes, and the priority levels [K : N] are used for real-time processes.
+
+1)
+A batch process could enter at priority level 1.
+2)
+A batch process could enter at priority level N.
+3)
+A real-time process could enter at any priority level.
+4)
+A batch process could enter at priority level K - 1 and gradually descend through all level until level 1.
+5)
+Interactive or batch processes can execute only when no real-time processes are present.
+
+A 2-tier approach with floating priorities
+Most modern general-purpose OSs (Ex: Windows, Linux) use more sophisticated scheduling strategies to provide more flexibility. Real time processes use either FIFO or RR in an ML scheme. Interactive and batch processes use a variation of MLF. Every process is assigned a base priority at creation but an increment is added based on the past action the process has taken. Ex: Returning from a request for keyboard input would add 6 to the base priority while returning from a request for disk input would add only 1. Thus the current priority depends on the type of process and the process's behavior.
+participation activity
+3.5.3: A 2-tier scheduling scheme with floating priorities.
+
+  Priority
+  levelCPU...K-191...NK......MLMLF with
+floating prioritiesBatch/interactive
+    processes1510Real-time
+processes............base prioritycurrent priority+6+1qp
+. An arrow labeled current priority points to level 10. Process p slides up from level 9 and enters queue at level 10. Step 5: Another process q with the same base priority 9 arrives. Box representing process p points to priority level 9 with an arrow labeled base priority. Step 6: If q returned from a request for keyboard input, an increment of 6 is added to the base priority. Thus q enters the queue with the current priority 
+. An arrow labeled current priority points to level 15. Process q slides up from level 9 and enters queue at level 15.
+
+Captions
+Real-time processes are scheduled using ML with fixed priorities between levels N and K. Within each queue, FIFO or RR is used.
+Batch and interactive processes use MLF but the priorities fluctuate with the type of process and the action taken by each process.
+Process p with the base priority 9 arrives.
+If p returned from a request for disk input, an increment of 1 is added to the base priority and p enters with the current priority 9 + 1 = 10.
+Another process q with the same base priority 9 arrives.
+If q returned from a request for keyboard input, an increment of 6 is added to the base priority. Thus q enters the queue with the current priority 9 + 6 = 15.
+
+participation activity
+3.5.4: Scheduling with floating priorities.
+The base priority of process p is 10.
+The priority increment for returning from a keyboard input is 6.
+The priority increment for returning from a disk input is 1.
+The highest MLF priority is 16 and the maximum time allowable at level 16 is Q. The quantum size is doubled with each decreasing priority level. Thus at priority level L, the maximum time allowed is 2(16-L)Q time units.
+
+1)
+p blocks on keyboard input and returns to the RL at priority _________.
+2)
+p's priority after running for Q time units is _________.
+3)
+p's priority after running for an additional 3Q time units is _________.
+4)
+p blocks on disk input and returns to the RL at priority _________.
+5)
+p's priority after running for an additional 10Q time units is _________.
+
+challenge activity
+3.5.1: 2-tier scheduling with floating priorities.
+764382.5329120.qx3zqy7
+A scheduler uses MLF with floating priorities. 
+
+The priority increment for returning from a keyboard input is 9.
+The priority increment for returning from a disk input is 3.
+The priority increment for returning from a printer input is 2.
+The base priority of process p is 5.p reenters at priority level when returning from a request for keyboard input.
+Ex: 4
+1
+2
+3
+1
+2
+3
+
+Exercise
+3.5.1: Scheduling with floating priorities.
+
+The priority increment for returning from a keyboard input is 2.
+The priority increment for returning from a disk input is 1.
+The highest MLF priority is 4.
+The maximum time allowable at level 4 is Q time units and doubles at each lower level.
+The base priority of process p is 1.
+The operation of blocking a process takes Q time units.
+
+p runs for 3Q starting at level 4
+p blocks on keyboard input
+p wakes up and continues running for 7Q
+p blocks on disk input
+p wakes up and continues running for 3Q
+p blocks on keyboard input
+p wakes up and continues running for 2Q
+(a)
+Show at which priority level the process p is executing during each of the 18Q time units.
+
+How was this section?
+
+|
+
+
+Provide section feedback

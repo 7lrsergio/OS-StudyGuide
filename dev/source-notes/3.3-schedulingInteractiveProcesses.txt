@@ -1,0 +1,348 @@
+
+3.3: Scheduling of interactive processes
+
+Activities:
+P
+Participation
+Due: 09/10/2026, 11:59 PM CDT
+3.3 Scheduling of interactive processes
+An interactive process communicates with the user in the form of a dialog by receiving commands or data from the keyboard or a pointing device and responding by generating output on the user's terminal or another output device.
+
+The primary goal in scheduling interactive processes is to respond promptly to each input. Consequently, interactive processes must time-share the CPU using preemptive scheduling to give each process a chance to make progress in a timely manner.
+
+RR scheduling algorithm
+A time quantum, Q, is a small amount of time (typically 10 to 100 milliseconds) during which a process is allowed to use the CPU.
+
+The round-robin (RR) algorithm uses a single queue of processes. The priority is determined solely by a process's position within the queue. The process at the head of the queue has the highest priority and is allowed to run for Q time units. When Q ends, the process is moved to the tail of the queue and the next process now at the head of the queue is allowed to run for Q time units.
+
+participation activity
+3.3.1: Execution under RR scheduling.
+
+time quanta012345678910p1p2p3 - - - - - - - - - - - - - - - - - - - -- - - - - - - - - -- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - -  - - - - - - - - - - - - - - - - - - - - - - - - - - -  - - - - - - - 
+
+Captions
+Three processes with total CPU times of 4, 4, and 2 start executing under RR.
+p1 executes for 1 quantum, then p2, then p3.
+The same cycle repeats: p1, p2, p3 execute for 1 quantum each. p3 terminates.
+p1 and p2 then share the CPU using RR until both terminate.
+
+participation activity
+3.3.2: Equal-size processes running under RR.
+4 processes, p1-p4, each of length 4, execute under RR. The time quantum is Q=1.
+
+1)
+p1 will terminate at time _________.
+
+    
+
+
+Show answer
+2)
+p4 will terminate at time _________.
+
+    
+
+
+Show answer
+
+participation activity
+3.3.3: Speed of time-sharing processes.
+A process executes k instructions per second when running uninterrupted. Assuming the overhead of context switching is negligible, how many instructions will each of n processes time-sharing the CPU execute per second?
+
+    
+
+
+Show answer
+
+participation activity
+3.3.4: RR vs batch scheduling.
+When Q is very large, RR approaches _________.
+
+ML scheduling algorithm
+RR scheduling treats all processes as equals. External priorities can be used to divide processes into groups based on importance. Multilevel (ML) scheduling maintains a separate queue of processes at each priority level. Within each level, processes are scheduled using RR.
+
+participation activity
+3.3.5: ML scheduling.
+
+rPriorityCPUqts...NN-1N-21p...vxu
+, 
+, 
+, and so forth, down to 1. Each queue has zero or more process boxes. Arrows indicate movement from the head of a queue to the CPU, and from the CPU to the tail of the same queue, illustrating the round-robin process within each priority level. The highest priority level is marked as 
+ and the lowest as 1. Step 1: ML maintains processes in queues at 
+ different priority levels. Level N is empty, level N-1 contains processes p, q, r, level N-2 contains processes s, t, and level 1 contains process u. Step 2: The process at the head of the highest-priority queue (
+) is selected for execution. Process p moves from the head of level N-1 queue into the CPU box. Step 3: When the maximum time allowable for this level expires, the running process (
+) moves to the tail of the same queue and the next process (
+) starts using the CPU. Process p cycles back to the end of the N-1 queue. The next process, q, moves into the CPU. Step 4: A new process (
+) with priority 
+ is entered at the tail of the corresponding queue. A new process, v, enters priority queue N-2. Step 5: A new process (
+) with a priority higher than the currently running process (
+) preempts the running process. A new process, x, enters queue N. Process q exits the CPU box and goes back to the end of queue N-2. Process x enters CPU. Step 6: Processes at a given level can run only if all queues at higher levels are empty. Ex: 
+ will run only after processes at levels 
+ and 
+ terminate. Process x disappears from CPU. Process s, currently at the head of queue N-2, enters the CPU.
+
+Captions
+ML maintains processes in queues at N different priority levels.
+The process at the head of the highest-priority queue (p) is selected for execution.
+When the maximum time allowable for this level expires, the running process (p) moves to the tail of the same queue and the next process (q) starts using the CPU.
+A new process (v) with priority N-2 is entered at the tail of the corresponding queue.
+A new process (x) with a priority higher than the currently running process (q) preempts the running process.
+Processes at a given level can run only if all queues at higher levels are empty. Ex: s will run only after processes at levels N and N-1 terminate.
+
+participation activity
+3.3.6: Order of process executions under ML.
+Process p is in the queue at level N-3, followed by process q at the same level. Queues at levels N through N-2 are empty. The quantum size is 1 time unit.
+
+1)
+If p needs 2 units of CPU time and q needs 1 unit of CPU time, process _________ will terminate first.
+2)
+When p starts executing, a new process r with a CPU time requirement of 3 units arrives at level N. The 3 processes will terminate in the order _________.
+
+participation activity
+3.3.7: ML scheduling.
+1)
+ML is prone to starvation.
+2)
+Instead of using RR, a different algorithm (Ex: FIFO, SJF, or SRT), could effectively be used at each level for interactive processes.
+
+MLF scheduling algorithm
+Multilevel feedback scheduling is similar to ML but addresses the problems of starvation and fairness by:
+
+using a different time quantum at each priority level
+changing the priority of every process dynamically
+Under the multilevel feedback (MLF) algorithm a newly arriving process enters the highest-priority queue, N, and is allowed to run for Q time units. When Q is exceeded, the process is moved to the next lower priority queue, N-1, and is allowed to run for 2Q time units. The quantum size is doubled with each decreasing priority level. Thus at priority level L, the maximum time allowed is 2(N-L)Q time units.
+
+MLF automatically favors short-running processes while processes with long running times gradually migrate to lower priority levels.
+
+participation activity
+3.3.8: MLF scheduling.
+
+Maximum
+   time  Priority 
+   levelCPUrq...NN-1N-21p...Q2Q4Q 
+ ...
+
+Captions
+
+participation activity
+3.3.9: Execution under MLF.
+For each of the following total CPU times, determine the priority level at which a process p will terminate under MLF, assuming the highest priority level is N and the time quantum is Q=1.
+
+1)
+Total CPU time = 1
+
+    
+
+
+Show answer
+2)
+Total CPU time = 2
+
+    
+
+
+Show answer
+3)
+Total CPU time = 3
+
+    
+
+
+Show answer
+4)
+Total CPU time = 4
+
+    
+
+
+Show answer
+5)
+Total CPU time = 8
+
+    
+
+
+Show answer
+
+Performance of interactive scheduling algorithms
+The response time of a process is the elapsed time from the submission of a request (pressing the Enter key or clicking a mouse button) until the response begins to arrive. Guaranteeing adequate response time is the primary goal in the scheduling of interactive processes.
+
+For a process running alone, the response time depends on the type of request. Ex: The time between pressing a key and seeing the character appear on the screen should be imperceptible by the human eye. A request to spell-check a document or render a video clip could take a few seconds.
+
+When multiple processes time-share the CPU, the response time increases with the number of processes, the length of the time quantum, and the time it takes to perform a context switch.
+
+participation activity
+3.3.10: Effect of context switching overhead and quantum size on time-sharing performance.
+
+0123456time100/2 = 50%66/2 = 33%75/2 = 37.5%75/3 = 25%Useful CPU time
+   per processUseful CPU time
+   per processUseful CPU time
+   per process  CPU time
+per processResponse
+   timeResponse
+   timeResponse
+   timeResponse
+   time 1065378910111213100%CPU timeResponse
+   time 1
+
+Captions
+The response time of a process is the interval between making a request and receiving a response. The process uses 100% of the CPU and the response time (brown) is 1 unit.
+When 2 processes time-share the CPU and context switching overhead is negligible, the CPU is divided evenly between the two processes. Each process gets 50% of the CPU time.
+The first process experiences 2 additional units of response delay, which are used by the second process.
+When the quantum is 2 units as before but context switching overhead is 1 (red), the useful CPU time is reduced to 66.66% and each process gets only 66.66/2 = 33.33% of the CPU time.
+The response time increases to 5. One quantum (2 units) is used by the other process (blue) and 2 time units are used by the two context switches (red).
+When the quantum is increased to 3 time units, the overhead (red) is reduced to 25%. Each process gets half of the useful CPU time: 75/2 = 37.5%.
+The price paid for the improved CPU utilization is an increase in the response time by 1 unit due to the longer quantum of the second process.
+When a third process joins the group, the useful CPU is divided among the 3 processes: 75/3 = 25%.
+The response time increases correspondingly: 2 quanta (3 units each) for the other two processes (blue) plus 3 units for context switching overhead (red).
+
+participation activity
+3.3.11: Impact of context switching on process execution time.
+5 processes are time-sharing the CPU using RR scheduling. The total CPU time of each process is 10 seconds (10,000 ms).
+
+1)
+If context switching time is negligible, the total execution time of all processes will be _________ ms.
+
+    
+
+
+Show answer
+2)
+With a time quantum Q = 100 ms, each process will experience _________ time slices.
+
+    
+
+
+Show answer
+3)
+If the context switching time is S = 10 ms, the additional overhead from context switching is _________ % of Q.
+
+    
+
+
+Show answer
+4)
+If the context switching time is S = 10 ms, the total execution time of all processes will be _________ ms. Assume that a context switch occurs even after the last process (back to the OS).
+
+    
+
+
+Show answer
+
+challenge activity
+3.3.1: Scheduling of interactive processes.
+764382.5329120.qx3zqy7
+Two processes, p1 and p2, arrive at time 0 and start executing using RR scheduling. (p1 starts before p2) 
+The total CPU time of p1 is 40 time units, and p2 is 10.
+The quantum is Q = 10.
+The context switching time is S = 0. The turnaround time of p1 is
+
+The turnaround time of p2 is 
+
+The average turnaround time, ATT, is 
+Ex: 12
+1
+2
+3
+4
+5
+6
+1
+2
+3
+4
+5
+6
+
+Exercise
+3.3.1: Turnaround time under RR scheduling.
+
+Three processes, p1, p2, p3, arrive at the same time and start executing using RR scheduling.
+p1 starts first, followed by p2, and then p3.
+The respective total CPU times of the 3 processes are 8, 3, 5 time units.
+The context switching time is negligible.
+
+(a)
+Determine the average turnaround time, ATT, when the quantum is Q = 1 time unit.
+
+(b)
+Determine the average turnaround time, ATT, when the quantum is Q = 3 time units.
+
+
+Exercise
+3.3.2: Determining process execution time.
+
+n processes are time-sharing the CPU using RR scheduling, each requiring T ms of CPU time to complete.
+
+(a)
+How long will the execution take on a machine with n CPUs?
+
+(b)
+How long will the execution take on a single CPU machine when the context switch overhead is zero?
+
+(c)
+How long will the execution take on a single CPU machine when:
+
+the length of the time quantum is Q ms
+the time to perform each context switch is S ms
+(d)
+Repeat the previous calculation using n=5, T=10,000, Q=100, S=10.
+
+
+Exercise
+3.3.3: Determining quantum size.
+
+n processes are time-sharing the CPU, each requiring T ms of CPU time to complete. The context switching overhead is S ms.
+
+(a)
+What should be the quantum size Q such that the gap between the end of one quantum and the start of the next quantum of any process does not exceed M ms?
+
+(b)
+For n = 5, S = 10, and M = 450, M = 90, M = 50, determine:
+
+The corresponding values of Q
+The percentage of CPU time wasted on context switching
+
+Exercise
+3.3.4: Impact of quantum size.
+
+n processes are time-sharing the CPU. The average total CPU time is T. The time quantum is Q. The context switching overhead is S. Determine the fraction of CPU time wasted on context switching for the following cases:
+
+(a)
+T < Q
+
+(b)
+T >> Q
+
+(c)
+Q approaches 0
+
+(d)
+Under what condition will the wasted fraction of CPU time be 50%?
+
+
+Exercise
+3.3.5: Scheduling with MLF.
+
+A MLF algorithm uses 5 priority levels. At level 5, a process executes for Q = 1 ms. At each of the lower levels the quantum is doubled (2Q, 4Q, 8Q, 16Q).
+The following processes are to be scheduled:
+
+Process	Arrival	Total CPU time
+p1	0	1
+p2	1	3
+p3	1	13
+After termination, each process blocks for 5 ms and then reenters the queue again at level 5.
+
+(a)
+Draw a timing diagram for the first 30 ms. On each of the 3 lines (one per process) show when the process is running and at which priority level.
+
+(b)
+Determine the ATT for each process.
+
+
+How was this section?
+
+|
+
+
+Provide section feedback

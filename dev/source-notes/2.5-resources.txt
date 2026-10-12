@@ -1,0 +1,271 @@
+
+2.5: Resources
+
+Activities:
+P
+Participation
+Due: 09/03/2026, 11:59 PM CDT
+2.5 Resources
+Representing resources
+The OS maintains numerous resources that processes can request and release at runtime. Ex: Hardware resources include keyboards, pointing devices, printers, disk and tape drives, cameras, speakers, and many other types of devices. Software resources include input/output buffers, locks on database tables, messages, timers, and many others.
+
+Most resources can be represented and handled uniformly using the same data structure and operations. Similar to a PCB, a resource control block (RCB) is a data structure that represents a resource. The specific implementation and the contents of the RCB vary between different OSs but the following is a generic structure that can handle many types of resources:
+
+Table 2.5.1: A generic RCB of resource r.
+RCB field	Explanation
+resource_description	Contains the description of r's properties and capabilities.
+state	Shows the current availability of r. If r is a single-unit resource then this field indicates whether r is currently free or allocated to some process. If r has multiple identical units, such as a pool of identical buffers, then this field keeps track of how many units are currently free and how many are allocated.
+waiting_list	When a process requests r and r is currently unavailable then the process's PCB is removed from the ready list and added to r's waiting list. The process is moved back to the ready list when r becomes available and is allocated to the process.
+
+participation activity
+2.5.1: RCB implementation.
+1)
+With a single-unit resource, the state is just a Boolean.
+2)
+A waiting list can be implemented as a linked list where each element points to a PCB.
+
+participation activity
+2.5.2: Organization of RCBs.
+The set of all RCBs can be implemented in different ways, depending on whether the number of RCBs is fixed or variable, and whether all RCB fields can be represented by only integers. Find the best implementation for each case.
+
+How to use this tool
+Linked list of structures
+Linked list of integer arrays
+2-D array of integers
+Array of structures
+# of RCBs is fixed, all fields contain only integers
+# of RCBs is variable, all fields contain only integers
+# of RCBs is fixed, some fields contain values other than integers
+# of RCBs is variable, some fields contain values other than integers
+
+
+Requesting a resource
+A resource is allocated to a process if the process has access to and is able to utilize the resource. A resource is free if the resource may be allocated to a requesting process.
+
+When the currently running process needs a resource, the process invokes a request() function. The request resource function allocates a resource r to a process p or blocks p if r is currently allocated to another process.
+
+If r is currently free, the state of r is changed to allocated and a pointer to r is inserted into the list of other_resources of p.
+If r is not free, the calling process p is blocked. p's PCB is moved from the RL to the waiting_list of r. Since the calling process, p, is now blocked, the scheduler must be called to select another process to run.
+Figure 2.5.1: The request resource function.
+request(r) {
+   if (r.state == free) {
+      r.state = allocated
+      Insert r into self.other_resources 
+   }
+   else {
+      self.state = blocked
+      Move self from RL to r.waiting_list 
+      scheduler()
+   }
+}
+
+participation activity
+2.5.3: Implementing request.
+1)
+A process can be blocked on more than one resource.
+2)
+A request can be initiated by any process, regardless of the process's current state.
+3)
+Instead of blocking the calling process when the resource is not available, the function could return immediately and let the process continue executing.
+
+Releasing a resource
+When the currently running process, p, wishes to release a resource r, the process invokes a release() function. The release resource function allocates the resource r to the next process on the r's waiting list. If the waiting list is empty, r is marked as free.
+
+If r's waiting_list contains no processes then the state of r is changed to free and p continues executing.
+If the waiting list of r is not empty then the process q at the head of the list is allocated r, the state of q is changed to ready, and q is moved from the waiting_list to RL. Since a new process (q) is now on RL, the scheduler must be called to decide which process (p or q) should continue to run.
+Figure 2.5.2: The release resource function.
+release(r) {
+   Remove r from self.other_resources
+   if (r.waiting_list == empty)
+      r.state = free
+   else
+      Remove process q from the head of r.waiting_list
+      Insert r into q.other_resources
+      q.process_state = ready      
+      Move q from r.waiting_list to RL
+      scheduler()
+}
+
+participation activity
+2.5.4: Number of processes reactivated by release.
+The release function always reactivates ________.
+
+participation activity
+2.5.5: Release with multiple-unit resources.
+Assume the release function is modified to handle resources with multiple identical units. Each call to release could reactivate ________.
+
+participation activity
+2.5.6: Implementing release.
+The release function may cause the calling process to stop running. To avoid penalizing the process for releasing a resource, a fairer approach would be not to call the scheduler as part of the release.
+
+The scheduler
+The scheduler function determines which process should run next and starts the process. The scheduler function is called at the end of each of the process and resource management functions: create, destroy, request, release.
+
+Assuming the RL is implemented as a priority list, the scheduler() function performs the following tasks:
+
+Find the highest priority process q on the RL.
+Perform a context switch from p to q if either of the following conditions is met:
+The priority of the running process p is less than the priority of q. This condition can be true when scheduler() is called from create() or from release(). In both cases the process q could have a higher priority than p.
+The state of the running process p is blocked. This condition is true when scheduler() is called from request() and the resource is not available. The request function changes the status of p to blocked, but the process continues executing the request and scheduler functions until the context switch is performed at the end.
+Figure 2.5.3: The scheduler function.
+scheduler() {
+   Find highest priority process q on RL
+   if (p.priority < q.priority) or (p.process_state == blocked)
+      perform context switch from p to q
+}
+
+participation activity
+2.5.7: Possibility of context switch.
+The calling process p could be preempted by some other process q when scheduler() is called from _________.
+
+1)
+create()
+2)
+destroy()
+3)
+request()
+4)
+release()
+
+participation activity
+2.5.8: Scheduler with a single-priority RL.
+If RL is implemented as a single list without priority levels and every new process is entered at the tail of RL then the following functions do not need to call the scheduler:
+
+1)
+create()
+2)
+destroy()
+3)
+request()
+4)
+release()
+
+challenge activity
+2.5.1: Resource handling.
+The following diagram shows the process_state and other_resources fields of 4 processes in the PCB array. The RCB array shows the state and the waiting_list of 4 resources.
+764382.5329120.qx3zqy7
+PCB 0
+...
+...
+...
+process_stateother_resourcesPCB 1PCB 2PCB 3
+...
+...
+...
+...
+...
+...
+...
+...
+...
+PCB 0's other_resources field does not point to any resource. PCB 1's other_resources field does not point to any resource. PCB 2's other_resources field points to resource 2. PCB 3's other_resources field points to resource 3, which points to resource 1. RCB 0's waiting_list field does not point to any process. RCB 1's waiting_list field does not point to any process. RCB 2's waiting_list field points to process 1, which points to process 0. RCB 3's waiting_list field does not point to any process.RCB 0statewaiting_list
+...
+...
+RCB 1
+...
+...
+RCB 2
+...
+...
+RCB 3
+...
+...
+Fill in the missing RCB values.23110
+Select
+
+Select
+
+Select
+
+Select
+1
+2
+3
+4
+5
+1
+2
+3
+4
+5
+
+Exercise
+2.5.1: Request and release functions in action.
+
+Two processes (7 and 8) are currently on RL. Process 8 is at the head of the list and is running. The next field of process 8 points to process 7, which is ready.
+Process 7 is currently holding two resources (15 and 25). The other_resources field of process 7 points to resource 15, which in turn points to the next resource, 25.
+Label PCBs. Matrix. Columns labeled 7 and 8. Rows labeled process_state, other_resources, next. Contents: 1st row: read, running. 2nd row: 15, -. 3rd row: -, 7. Box labeled RL, contents 8. Label RCBs. Matrix. Columns labeled 15 and 25. Rows labeled state, wait_list, next. Contents: 1st row: allocated, allocated. 2nd row: -, -. 3rd row: 25, -.
+(a)
+Show all changes to the data structures after process 8 requests resource 15.
+
+(b)
+Show all changes to the data structures after process 7 releases resource 15.
+Assume that processes are entered into RL at the end of the list.
+
+
+Exercise
+2.5.2: Effect of operations on processes and resources.
+
+Consider a system of processes and resources and make the following assumptions:
+
+The Ready List (RL) has 3 priority levels, 0, 1, and 2 (0 being the lowest).
+The create function is simplified: create(n) creates a new child process with the priority n. The process is placed at the end of the corresponding RL queue.
+Only a single CPU exists. The currently running process continues running until the process:
+blocks by requesting an unavailable resource, or
+is interrupted by a function timeout(), which moves the process from the head of the current RL queue to the end of the same queue; the process currently at the head of the RL queue starts running
+The system has 3 resources, 0, 1, 2.
+At the start, only a single process, described by PCB 0, exists and is running at priority 2.
+(a)
+Assume the following sequence of functions is issued (each function is executed by the currently running process). The create function always uses the next available PCB 1, 2, 3, …:
+
+create(1)
+create(2)
+timeout()
+create(0)
+timeout()
+create(2)
+Determine how many child processes each process has at the end of the above sequence.
+
+(b)
+Assume that the above sequence continues as follows:
+
+timeout()
+request(1)
+timeout()
+request(2)
+request(1)
+timeout()
+request(2)
+Determine which processes are blocked at the end of the above sequence.
+
+(c)
+Assume that the currently running process executes destroy(2). Determine:
+
+The total number of processes in the system.
+Which resources are free.
+
+Exercise
+2.5.3: Managing multi-unit resources.
+
+(a)
+Extend the request and release functions to work with resources having multiple identical units.
+
+p.other_resources is a list of pairs (r, k) where r is a resource and k is the number of units that p is holding.
+r.state is a counter that keeps track of the currently available units of r.
+r.waiting_list contains pairs (p, k) where p is the waiting process and k is the number of requested units.
+The request function has the form request(r, k) where r is the resource and k is the number of units. To simplify the algorithm, a process may request units of the same resource only once.
+The release function has the form release(r) where r is the resource. All k units of r are released at the same time.
+Note that a release of k units may enable more than one process from r.waiting_list.
+(b)
+A process could remain stuck in r.waiting_list forever if the number of units requested exceeds the total number of units available initially in r. How could that problem be prevented?
+
+(c)
+A process p could starve by being skipped over by processes arriving after p but requesting smaller numbers of units than p. How could that problem be prevented?
+
+
+How was this section?
+
+|
+
+
+Provide section feedback

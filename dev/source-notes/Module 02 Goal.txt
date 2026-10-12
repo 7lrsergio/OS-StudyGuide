@@ -1,0 +1,94 @@
+
+PAGE 1
+Page 1 of 3 
+ 
+ 
+Module 2: Processes, Threads, and Resources 
+8/24/202 6 
+Copyright © 2026 by Dale R. Thompson {d.r.thompson@ieee.org} 
+Goal/Assessment  
+Goal 
+Where are we going? What is expected? What will the student be able to do, know, and 
+value at the end? 
+The student will be able to describe processes, the process control block, operations on 
+processes, resources, and threads. 
+Assessment 
+How do we measure? How will the student be assessed in the lessons and at the end of 
+the module? Use general terms. Present this to the student at the beginning of the 
+module. 
+A student should be able to: 
+• Define a process. 
+• Define a process control block (PCB). 
+• Draw a state diagram of a process and describe the process states and 
+transitions. 
+• Define a context switch. 
+• Describe the benefits of a virtual CPU. 
+• List and describe the contents of a generic process control block (PCB). 
+• Describe parent-child relationships among processes. 
+• Define a resource control block (RCB). 
+• Define a thread. 
+• Compare and contrast a single-threaded process versus a multi-threaded 
+process. 
+• Describe the difference between user-level threads and kernel-level threads. 
+Hook 
+Pique the student’s interest using a case study, interesting story, experiment, or 
+disaster. 
+Question: What is a process? 
+
+PAGE 2
+ 
+ 
+Lessons 
+Divide the module into logical lessons (4-5 days). Create lessons, activities, 
+experiments, homework and/or quizzes based on these grain size lessons. 
+Lesson: The process concept 
+Lesson: Why processes? 
+Lesson: The process control block 
+Lesson: Operations on processes 
+Lesson: Resources 
+Lesson: Threads 
+Lesson: Why threads? 
+Lesson: Review of pointers 
+Lesson: Introduction to threads 
+Representative Topics 
+• process, process control block (PCB), process states and transitions, context 
+switch, CPU state, physical CPU, virtual CPU, time sharing, benefits of virtual 
+CPUs, multiple cooperating processes, the process control block, contents of 
+generic PCB, PCB data structure, organizing PCBs, avoiding linked lists, 
+managing PCBs, parent-child, process creation, process destruction, 
+representing resources, requesting a resource, releasing a resource, the 
+scheduler, fork(), threads, define a thread, program counter, stack pointer, single-
+threaded, multi-threaded, user-level vs kernel-level threads, mapping user-level 
+threads on kernel-level threads, pointers, pthread 
+Culminating Activity 
+Tie it all together returning to the big idea. Go full circle. Create a culminating 
+experience that ties lessons back to the module theme. Create module-level rubric and 
+each topic is one of the lessons below. 
+
+PAGE 3
+Page 3 of 3 
+ 
+ 
+Homework. 
+Assessment 
+Assess the results using tools such as paper/pencil, programming, simulation, 
+demonstration, experiments, and projects. Paper and pencil homework assesses what 
+you know. Programming, simulations, demonstrations, and projects assess what you 
+can do. 
+Assessment: 
+Reading assignments, homework, quizzes, and exam  
+Copyright Notice 
+This material is Copyright © 2026 by Dale R. Thompson. It may be freely redistributed in 
+its entirety provided that this copyright notice is not removed. It may not be sold for profit 
+or incorporated in commercial documents without the written permission of the copyright 
+holder. 
+Acknowledgment 
+Any opinions, findings, and recommendations or conclusions expressed in these 
+materials are those of the author. 
+Liability Release 
+The curriculum activities and lessons have been designed to be safe and engaging 
+learning experiences and have been field-tested with university students. However, due 
+to the numerous variables that exist, the author(s) does not assume any liability for the 
+use of this product. These curriculum activities and lessons are provided as is without 
+any express or implied warranty. The user is responsible and liable for following all 
+stated and generally accepted safety guidelines and practices. 

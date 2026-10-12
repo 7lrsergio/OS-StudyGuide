@@ -1,0 +1,445 @@
+
+4.5: Classic synchronization problems
+
+Activities:
+P
+Participation
+Due: 09/17/2026, 11:59 PM CDT
+4.5 Classic synchronization problems
+The readers-writers problem
+The readers-writers problem is an extension of the critical section problem where two types of processes, readers and writers, compete for access to a common resource. Readers are allowed to enter the critical section (CS) concurrently but only one writer is allowed to enter at a time.
+
+The main challenge is to guarantee maximum concurrency of readers while preventing the starvation of either type of process. Specifically, two rules must be enforced:
+
+A reader is permitted to join other readers currently in the CS only when no writer is waiting. When the last readers exits the CS, the writer is allowed to enter.
+All readers that have arrived while a writer is in the CS must be allowed to enter before the next writer.
+Rule 1 guarantees that writers cannot starve. Rule 2 guarantees that readers cannot starve. Jointly the two rules guarantee maximum concurrency of readers.
+participation activity
+4.5.1: Order of readers and writers entering the critical section.
+
+r1r2r3r4r5r6r7w1w2critical sectionw3r8
+
+Captions
+Three readers arrive at the CS. Since the CS is empty, all three are allowed to enter.
+A fourth reader arrives. Since no writer is waiting, r4 is allowed to join the other readers.
+When a writer arrives, no more readers are allowed to enter.
+When the last reader leaves, w1 is allowed to enter.
+While w1 is in CS, other readers and writers may arrive.
+When w1 leaves, all readers, including those arriving after w2 and w3, are allowed to enter.
+
+participation activity
+4.5.2: Order of reader and writer processing.
+1)
+While w1 is in the CS, the following processes arrive:
+r1, r2, w2, w3, r3.
+The processes will enter the CS in the order:
+2)
+While r1 is in the CS, the following processes arrive:
+r2, w1, w2, r3, r4.
+The processes will enter the CS in the order:
+
+participation activity
+4.5.3: A modified rule for readers.
+Changing the second rule of the requirements to "All readers that arrive between any two writers are allowed to proceed concurrently" could:
+
+A monitor solution to the readers-writers problem
+The monitor provides 4 functions:
+
+start_read is called by a reader to get a permission to read
+end_read is called by a reader when finished reading
+start_write is called by a writer to get a permission to write
+end_write is called by a writer when finished writing
+Two counters, reading and writing, are used to keep track of the number of readers and the number of writers currently in CS, respectively.
+
+Two condition variables, ok_to_read and ok_to_write, are used to block readers and writers, respectively.
+
+To avoid maintaining separate counters of processes blocked on a condition c, a primitive count(c) is provided, which returns the number of processes blocked on c. Ex: count(ok_to_read) returns the number of processes blocked on ok_to_read.
+
+participation activity
+4.5.4: Readers-writers problem using a monitor.
+
+start_read() {if (writing > 0 || count(ok_to_write) > 0) ok_to_read.waitreading = reading + 1ok_to_read.signal}end_read() {reading = reading - 1if (reading == 0) ok_to_write.signalstart_write() {if (reading > 0 || writing > 0) ok_to_write.waitwriting = 1}end_write() {writing = 0if (count(ok_to_read) > 0) ok_to_read.signalelse ok_to_write.signal} monitor readers-writers CS}r1r2r3r4w1w2reading = 0;reading = 1;reading = 2;writing = 0writing = 1
+
+Captions
+A reader r1 calls start_read(). Since no writer or reader is in the CS, r1 increments the reading counter and enters the CS. The ok_to_read.signal has no effect since the queue is empty.
+A second reader, r2, arrives. The conditions are the same and thus r2 joins r1 in the CS.
+A writer w1 arrives and calls start_write. Since reading > 0, w1 blocks on ok_to_write.
+The next reader, r3, finds the queue ok_to_write not empty and so r3 blocks on ok_to_read.
+r1 leaves the CS and calls end_read. The reading counter is decremented but r1 is not the last process to leave and thus no signal is issued.
+When r2 leaves the CS, reading becomes 0. Since r2 is the last process to leave the CS, r2 signals to w1 to resume. Since the signal is the last operation, r2 leaves the monitor without blocking.
+w1 re-enters, sets writing to 1, and enters CS.
+While w1 is in the CS, a reader r4 and a writer w2 arrive. Since writing = 1, both processes get blocked on the respective queues.
+When w1 leaves the CS, a signal enables r3 to re-enter.
+Upon re-entering, r3 signals to the next reader on the queue, r4, which, in turn would signal to the next reader on the queue until all readers accumulated thus far had entered the CS.
+
+participation activity
+4.5.5: Type of variables used.
+1)
+ok_to_read and ok_to_write are
+2)
+reading is an integer variable where
+3)
+writing is an integer variable where
+
+participation activity
+4.5.6: Cases of blocking and signaling.
+1)
+If the CS is empty, then an arriving writer blocks subsequent readers from entering the CS by setting writing = 1.
+2)
+If readers are currently in the CS, then an arriving writer blocks subsequent readers from entering the CS by setting writing = 1.
+3)
+An exiting writer signals the next writer if ok_to_read queue is empty.
+4)
+An exiting writer signals all readers currently on the ok_to_read queue.
+5)
+Each reader re-entering from the ok_to_read queue signals the next reader on the same queue before entering the CS.
+6)
+Each exiting reader signals the next writer.
+
+The dining-philosophers problem
+The dining-philosophers problem is representative of situations where multiple processes compete for shared resources but each process needs more than one resource at a time.
+
+Five "philosophers", each representing a concurrent process, are seated around a table. Five "forks", each representing a resource, are placed on the table such that each two neighboring philosophers share one fork. Each philosopher alternates asynchronously between a phase of "thinking", which represents execution not requiring any shared resources, and "eating", which requires the prior acquisition of the two forks adjacent to the philosopher and shared with the two respective neighbors.
+
+The main challenge is to prevent deadlock while guaranteeing that any two nonadjacent philosophers can always eat concurrently.
+
+participation activity
+4.5.7: Requirements of the dining-philosophers problem.
+
+f[0]f[1]f[2]f[3]f[4]p[0]p[1]p[2]p[3]p[4]
+
+Captions
+Five philosophers, p[i], sit in a circle. Each p[i] has a left fork, f[i], and a right fork, f[i+1 mod 5]. Initially, all p[i]'s are thinking, which requires no resources.
+In order to eat, a philosopher needs to request both the left and the right fork. Ex: p[2] needs to request f[2] and f[3] to eat.
+If both forks are available, p[i] picks up the forks and starts eating.
+When finished eating, p[i] puts down both forks and enters again the phase of thinking.
+To prevent deadlock, a situation where each p[i] picks up one fork and is requesting the second must be avoided, since all p[i]s would be blocked forever.
+When one philosopher is eating, the two immediate neighbors are blocked because each needs one of the shared forks. Ex: p[2] is holding f[2] and f[3], which blocks p[1] and p[3].
+But the solution must guarantee that either p[0] or p[4] can eat concurrently with p[2], depending on which philosopher grabs the shared fork f[0] first.
+
+participation activity
+4.5.8: Requirements of the dining-philosophers problem.
+1)
+When no philosopher is eating then
+2)
+When p[4] is eating then _____ can eat concurrently.
+3)
+Deadlock can occur _____.
+
+Approaches to preventing deadlock
+The behavior of each philosopher p[i] can be represented as a loop that alternates between the phases of thinking and eating. Prior to eating, p[i] requests the two adjacent forks and returns the forks when finished eating. The forks can be represented as 5 semaphores, f[0] through f[4], all initialized to 1. P(f[i]) then corresponds to picking up fork f[i] and V(f[i]) corresponds to putting down fork f[i].
+
+p(i) {
+   while (1) {
+          think
+          P(f[i])
+          P(f[i+1 mod 5])
+          eat
+          V(f[i])
+          V(f[i+1 mod 5])
+   }
+}
+This code leads to deadlock since all philosophers can pick up the left fork f[i] concurrently and then block indefinitely on picking up the right fork. Several approaches exist to avoid the problem:
+
+Approach 1: Request both forks at the same time in a critical section.
+Approach 2: One philosopher picks up the forks in the opposite order from all other philosophers.
+participation activity
+4.5.9: Preventing deadlock in the dining-philosophers problem.
+
+f[0]f[1]f[2]f[3]f[4]p[0]p[1]p[2]p[3]p[4]p(i) {
+   while (1) {
+      think      P(f[i])
+      P(f[i+1 mod 5])      eat
+      V(f[i])
+      V(f[i+1 mod 5])
+   }
+} Approach 1  Approach 2 P(mutex)V(mutex)p(i) {
+   while (1) {
+      think      eat
+      V(f[i])
+      V(f[i+1 mod 5])
+   }
+}P(f[min(i, i+1 mod 5)])
+P(f[max(i, i+1 mod 5)])
+In Approach 2, the code is updated to:
+
+Captions
+One approach to preventing all philosophers from picking up the left fork first and becoming deadlocked is to force both forks to be picked up at the same time in a critical section.
+When one philosopher, p[2], has picked up the left fork, mutex is 1 and all other philosophers get blocked on P(mutex). p[2] is able to request and get the right fork and thus deadlock is prevented.
+But concurrency may be violated as shown in the following steps: When p[0] and p[2] are eating, p[3] is blocked on the left fork and p[1] and p[4] are blocked on P(mutex).
+When p[0] puts down the forks, p[4] remains blocked on mutex. Thus the solution violates the concurrency requirements: p[4] should be allowed to eat concurrently with p[2].
+With approach 2, each philosopher picks up the lower-numbered fork first. p[0] through p[3] pick up f[0] through f[3] first, respectively. But p[4] picks up the right fork f[0] before the left fork f[4] because 0<4.
+The new order prevents deadlock because the cycle cannot be closed regardless of whether p[0] or p[4] picks up f[0] first.
+If p[0] wins and picks up f[0] first then both p[0] and p[4] get blocked and p[3] can continue.
+If p[4] wins and picks up f[0] first then p[4] or p[3] each hold one fork and compete for f[4]. Regardless of which of the two wins, one can continue and thus deadlock is not possible.
+But concurrency can still be violated. When p[3] is eating, all others can become blocked in a chain waiting for each other. Thus neither p[0] nor p[1] can eat concurrently with p[3].
+
+participation activity
+4.5.10: States where concurrency is violated.
+Each table represents a snapshot of the dining-philosophers problem.
+
+A:
+holding	requesting
+p[0]	f[0]	f[1]
+p[1]	f[1],f[2]	
+p[2]		f[2]
+p[3]	f[3]	f[4]
+p[4]		f[0]
+B:
+holding	requesting
+p[0]	f[0]	f[1]
+p[1]	f[1]	f[2]
+p[2]	f[2],f[3]	
+p[3]		f[3]
+p[4]		f[0]
+C:
+holding	requesting
+p[0]	f[0],f[1]	
+p[1]		f[1]
+p[2]	f[2]	f[3]
+p[3]		f[3]
+p[4]		f[0]
+1)
+The concurrency requirements is violated in state ______.
+2)
+The only state possible with approach 1 is ______.
+
+participation activity
+4.5.11: State where concurrency violation depends on order of execution.
+
+holding	requesting
+p[0]		f[0]
+p[1]	f[1]	f[2]
+p[2]		f[2]
+p[3]	f[3]	f[4]
+p[4]	f[0],f[4]	
+In the above state, p[4] is eating and p[0] and p[3] are already blocked. If ______ continues, the concurrency requirement will be violated.
+
+A monitor solution to the dining philosophers problem
+Each of the 5 philosophers, p[i], can be in one of 3 states: thinking, hungry, or eating. Thinking does not require any forks. Hungry is a state where the philosopher is blocked because one or both forks are not available. In the eating state the philosopher is holding both forks and is executing.
+
+The forks are not represented explicitly by any data structure. Rather, the pickup(i) function switches p[i] from thinking to eating if p[i-1] and p[i+1] are not eating. Consequently, deadlock is not possible because no forks are picked up one at a time. Instead, the act of picking up the forks is represented implicitly by the single state transition from thinking to eating.
+Concurrent execution is guaranteed in that the putdown(i) function explicitly enables neighbor p[i-1] if p[i-2] is not eating and similarly the function enables neighbor p[i+1] if p[i+2] is not eating.
+participation activity
+4.5.12: Behavior of the dining-philosophers monitor.
+
+pickup(i) {state[i] = hungrytest(i)if (state[i] != eating) eat[i].wait}putdown(i) {state[i] = thinkingtest(i-1 mod 5)test(i+1 mod 5)}test(i) {if ((state[i-1 mod 5] != eating) &&(state[i] == hungry) &&(state[i+1 mod 5] != eating))state[i] = eatingeat[i].signal} monitor dining_philosophers state[5]condition eat[5]p[0]p[1]p[2]p[3]p[4]TTTTT current state HEHHEeat[0]eat[1]eat[2]eat[3]eat[4]TEp[2]p[1]
+
+Captions
+Five processes p[i] share the monitor. The initial state of all p[i]s is thinking (T).
+p[1] wishes to eat and calls pickup(). p[1]'s state changes to hungry (H). The internal function test() checks if the left neighbor p[i-1 mod 5] or the right neighbor p[i+1 mod 5] is eating.
+If neither neighbor is eating, p[1]'s state changes to eating (E) and p[1] leaves the monitor holding both forks. The signal in test has no effect in this case.
+While p[1] is eating, p[2] requests forks. p[2]'s state becomes H but test does not change the state to E since p[1] is eating. Thus p[2] becomes blocked on eat[2].
+If p[4] now calls pickup, the state first changes to H and then test changes the state to E since neither p[3] nor p[0] are eating. p[4] leaves the monitor holding both forks and eats concurrently with p[1].
+When p[1] finishes eating and calls putdown to return the forks, the state of p[1] changes back to T. The putdown function then calls test on both of p[1]'s neighbors, p[0] and p[2].
+When test is called on the left neighbor p[0], the state does not change to E since p[0] is not hungry.
+But when test is called on the right neighbor p[2], all three conditions are true and the state of p[2] changes to E.
+The signal reactivates p[2], which leaves the monitor and starts eating concurrently with p[4].
+
+participation activity
+4.5.13: Compatible states.
+When state[0] == E and state[2] == H then
+
+1)
+state[1] can be
+2)
+state[4] can be
+
+participation activity
+4.5.14: Conditions checked in the test() function.
+The function test() has 3 conditions connected by logical ANDs (&&). One of the 3 conditions is always true, depending on where the function is called.
+
+1)
+The condition (state[i] == hungry) is always true when p[i] calls test
+2)
+The condition (state[i-1 mod 5] != eating) is always true when p[i] calls test
+
+The elevator algorithm
+A storage disk consists of n concentric tracks that need to be accessed by read/write requests arriving in some unspecified order. The goal is to minimize the travel distance between tracks while preventing starvation.
+
+The elevator algorithm mimics the behavior of an elevator in an n-story building. The elevator (representing the read-write head of the disk), maintains a direction of motion, up or down, for as long as requests for floors (representing disk tracks) exist, in the current direction. When moving up and no more requests for higher floors exist, the elevator reverses direction and services all requests in descending order. When the request for the lowest floor is serviced, the elevator again reverses direction and proceeds moving up.
+
+participation activity
+4.5.15: Operation of the elevator algorithm.
+
+move_to(destination) {if (busy) if ((position<destination) ||(position==destination) && (direction==up))upsweep.wait(destination)else downsweep.wait(-destination)busy = 1position = destination}release() {busy = 0if (direction==up) if (!empty(upsweep)) upsweep.signalelse direction = downdownsweep.signalelse if (!empty(downsweep)) downsweep.signalelse direction = upupsweep.signal} monitor elevator condition upsweep, downsweep;   busy = 0busy 151015202530
+upsweepdownsweep1525302051331501
+To the right of the code snippet, a vertical line shows the floor numbers ranging from 1 to 30. The elevator is represented by a small square pointing to the current floor and showing the current direction (up or down). Step 1: Initially, the elevator is at floor 1, the direction is up, and the elevator is not busy. Upsweep and downsweep queues are empty, and the busy indicator is set to 0. Step 2: A request move_to(15) arrives. The elevator is not busy so the request is not blocked. Busy is set to 1 and position is set to 15. The elevator box moves up to floor 15. Step 3: While the elevator is busy at floor 15, a requests move_to(25) arrives. Since 25 is above the current position 15, the request is blocked in upsweep. A small box representing request 25 is added to the upsweep queue. Step 4: Subsequent requests for floors 30 and 20 are also blocked in upsweep but the use of priority waits keeps all request sorted in ascending order by destination. 30 and 20 are added to the upsweep queue and all requests are sorted in ascending order: 20, 25, 30. Step 5: Requests for floors 5,13, and 3 are inserted into downsweep but sorted from largest to smallest since the wait uses -destination as the priority. 13, 5, and 3 appear in the downsweep queue, sorted from largest to smallest. Step 6: If the elevator is busy at floor 15 and a request for the same floor arrives then the request must be blocked according to the current direction to be serviced during the same sweep. 15 is inserted into the upsweep queue above the previous requests 20, 25, 30. Step 7: When the first request is serviced, the process calls release. Since the elevator is still moving up and the upsweep queue is not empty, a signal reactivates the next process, which uses the same floor 15. An arrow points from upsweep.signal in release() to request 15 in upsweep queue. The elevator remains on floor 15 and request 15 is removed from the queue. Step 8: When floor 15 is serviced, each subsequent call to release reactivates the next request and the elevator keeps moving up. When floor 30 is reached, the direction is reversed. The elevator ascends, servicing floor 20, then 25, and finally 30. Upon reaching floor 30, the direction of the elevator switches to down. Step 9: The downsweep.signal in release() reactivates the first request (13) from the downsweep queue and the elevator moves to the new position 13. Request 13 is removed from the downsweep queue. Step 10: The elevator then continues moving down until the lowest floor (3) is serviced and the direction is reversed again. The elevator descends further, stopping at floors 5 and then floor 3, servicing each request and reversing the direction at the lowest floor.
+
+Captions
+Initially, the elevator is at floor 1, the direction is up, and the elevator is not busy.
+A request move_to(15) arrives. The elevator is not busy so the request is not blocked. Busy is set to 1 and position is set to 15.
+While the elevator is busy at floor 15, a requests move_to(25) arrives. Since 25 is above the current position 15, the request is blocked in upsweep.
+Subsequent requests for floors 30 and 20 are also blocked in upsweep but the use of priority waits keeps all request sorted in ascending order by destination.
+Requests for floors 5,13, and 3 are inserted into downsweep but sorted from largest to smallest since the wait uses -destination as the priority.
+If the elevator is busy at floor 15 and a request for the same floor arrives then the request must be blocked according to the current direction to be serviced during the same sweep.
+When the first request is serviced, the process calls release. Since the elevator is still moving up and the upsweep queue is not empty, a signal reactivates the next process, which uses the same floor 15.
+When floor 15 is serviced, each subsequent call to release reactivates the next request and the elevator keeps moving up. When floor 30 is reached, the direction is reversed.
+The downsweep signal reactivates the first request from the downsweep queue and the elevator moves to the new position 13.
+The elevator then continues moving down until the lowest floor (3) is serviced and the direction is reversed again.
+
+participation activity
+4.5.16: Choosing the correct condition queue.
+The elevator is at floor 20 and the direction is down.
+
+1)
+move_to(1) will be inserted into _____
+2)
+move_to(22) will be inserted into _____
+3)
+move_to(20) will be inserted into _____
+
+participation activity
+4.5.17: Order of requests on condition queues.
+1)
+The upsweep queue can contain the requests for the floors _____ in the given order.
+2)
+The downsweep queue can contain the requests for the floors _____ in the given order.
+
+challenge activity
+4.5.1: The readers-writers problem.
+764382.5329120.qx3zqy7
+Consider the monitor solution to the reader-writers problem. The first 3 columns of the table show the current contents of the ok_to_read queue, the ok_to_write queue, and the critical section CS. The next column shows new arrivals (readers or writers) at the monitor.
+
+Given the information in the table, determine the location of each new arrival.
+ok_to_read	ok_to_write	CS	New arrivals	Location
+1.	empty	empty	w1	r1	
+2.	empty	empty	empty	r1	
+3.	empty	empty	empty	w1	
+4.	empty	empty	r1, r2, r3, r4	w1	
+5.	empty	empty	r1, r2	r3	
+6.	empty	empty	w1	w2	
+
+Select
+
+Select
+
+Select
+
+Select
+
+Select
+
+Select
+1
+2
+3
+4
+5
+1
+2
+3
+4
+5
+
+Exercise
+4.5.1: Order of processing readers and writers.
+
+For the monitor solution to the readers/writers problem, assume the first request is a writer w1. While w1 is writing, the following requests all arrive in the given order:
+w2, r1, r2, w3, r3, w4
+
+(a)
+In which order will the requests be processed? Which groups of readers will be reading concurrently?
+
+(b)
+Two new readers r4 and r5 arrive while w2 is writing. When will each request be processed?
+
+
+Exercise
+4.5.2: Simplified reader/writers problem.
+
+(a)
+For the monitor solution to the readers/writers problem, assume that only one writer processes exists. Thus start_write will never be invoked until the preceding end_write has terminated. Simplify the code accordingly.
+
+
+Exercise
+4.5.3: A P/V solution to the reader/writers problem.
+
+
+reader() { 
+   P(mutex) 
+   reading++
+   if(reading == 1) P(w)
+   V(mutex)
+   READ
+   P(mutex)
+   reading--
+   if(reading == 0) V(w)
+   V(mutex)
+}
+writer() {
+   P(w)
+   WRITE
+   V(w)
+}
+Initially: mutex = w = 1; reading = 0
+(a)
+Does the solution satisfy the basic requirements of the readers/writers problem? Is starvation of readers or writers possible?
+
+
+Exercise
+4.5.4: A single-lane tunnel problem.
+
+A classical synchronization problem is an analogy of a single-lane tunnel, also known as the single-lane east-west bridge. To avoid a deadlock, cars must be prevented from entering the tunnel at both ends simultaneously. Once a car enters, other cars from the same direction may follow immediately.
+
+(a)
+Ignoring the problem of starvation, solve the problem using semaphores.
+Hint: The tunnel problem is a variation of the readers/writers problem where multiple readers or multiple writers are allowed to enter the critical region.
+
+
+Exercise
+4.5.5: The tunnel problem without starvation.
+
+(a)
+Write a monitor for the tunnel problem that guarantees that no direction of travel can be blocked indefinitely and thus prevents starvation.
+
+
+Exercise
+4.5.6: An inadequate solution for dining philosophers.
+
+Each of the five philosophers, p[i], in the dining philosophers problem executes the code:
+
+while(1){
+   think
+   P(mutex)
+      P(f[i])
+      P(f[i+1 mod 5])
+   V(mutex)
+   eat
+   V(f[i])
+   V(f[i+1 mod 5])
+}
+(a)
+Does the solution satisfy all requirements of the dining philosophers problem?
+
+
+Exercise
+4.5.7: Starvation in the dining philosophers problem.
+
+The monitor solution to the dining philosophers problem can lead to starvation.
+
+(a)
+Construct a scenario where 2 philosophers can repeatedly eat while the philosopher between the two starves.
+
+
+Exercise
+4.5.8: Modified elevator solution.
+
+The Elevator algorithm uses a complex condition to decide whether a request should be placed into the upsweep or the downsweep queue:
+
+if ((position < dest) || ((position == dest) && (direction == up)))
+(a)
+How will the behavior of the algorithm change if the compound condition is replaced by the simple condition:
+
+if (position < dest)
+(b)
+How will the behavior of the algorithm change if the compound condition is replaced by the simple condition:
+
+if (position <= dest)
+
+How was this section?
+
+|
+
+
+Provide section feedback

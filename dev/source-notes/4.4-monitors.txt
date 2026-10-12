@@ -1,0 +1,361 @@
+Skip to main content
+
+zybooks
+My library >
+CSCE 36103: Operating Systems home >
+4.4: Monitors
+zyBooks catalog
+Help/FAQ
+Notifications
+Sergio Lopez Rios
+4.3 Implementation of semaphores
+Students:
+Section 4.4 is a part of 2 assignments:
+RD4
+This assignment's due date has passed. Activity will still be recorded, but will not count towards this assignment (unless the due date is changed). See this article for more info.
+
+Activities:
+P
+Participation
+Due: 09/17/2026, 11:59 PM CDT
+4.4 Monitors
+P and V operations on general semaphores are versatile primitives capable of solving a variety of synchronization problems. But P and V operations are low-level primitives that are prone to difficult-to-diagnose programming errors.
+
+Basic principles of monitors
+A monitor is a high-level synchronization primitive implemented using P and V operations. Following the principles of abstract data types, a monitor encapsulates data along with functions through which the data may be accessed and manipulated.
+
+A condition variable is a named queue on which processes can wait for some condition to become true.
+
+The implementation of a monitor must:
+
+guarantee that the functions are mutually exclusive. Thus only one process at a time may be executing inside a monitor.
+provide condition variables such that a process can step outside of the monitor while waiting for a condition and thus not prevent other processes from entering the monitor.
+A condition variable c is accessed using two special operations:
+c.wait causes the executing process to block and be placed on a waiting queue associated with the condition variable c.
+c.signal reactivates the process at the head of the queue associated with the condition variable c.
+participation activity
+4.4.1: Operation of a monitor.
+
+ f() { ...x_is_positive.signalx = -1 monitor M x_is_positivep1if (x < 1)x_is_positive.wait... }g() { ...x = 5... }urgentp2x = 5
+
+Captions
+A monitor M has an internal variable x and 2 functions, f and g.
+A process entering the monitor by calling M.f() must wait for x to be positive before proceeding. A condition variable x_is_positive is defined for that purpose.
+Process p1 calls M.f() and finds x = -1. Executing "x_is_positive.wait" blocks the process on the condition variable.
+When another process p2 calls M.g() and sets x = 5, the condition is satisfied and the statement "x_is_positive.signal" reactivates the blocked process p1.
+Now p1 can resume executing f and p2 can continue executing g. But the monitor definition stipulates that only one process may execute inside the monitor.
+The semantics of signal grant the blocked process p1 the right to continue immediately while the signaling process p2 becomes blocked in a high-priority queue called urgent.
+When p1 exits the function f, the blocked process p2 is reactivated and can complete the function g.
+
+participation activity
+4.4.2: Operation of a monitor.
+1)
+A conditional variable can take any integer value.
+2)
+A monitor always contains internal variables and 2 functions.
+3)
+A monitor's internal variable or data structure can be accessed only by calling one of the monitor's functions.
+4)
+When multiple processes call a monitor function simultaneously, only one is allowed to execute the function while all others wait on the urgent queue.
+5)
+c.wait always blocks the calling process.
+6)
+c.signal always blocks the calling process, which is then placed on the urgent queue.
+
+A monitor implementation of the bounded-buffer problem
+The monitor primitive offers a simple solution to the bounded-buffer problem. Since the monitor guarantees mutual exclusion, the functions to deposit and to remove data automatically become critical sections. Consequently, the solution works for multiple producers and multiple consumers.
+
+The condition notfull is used by the producer to wait when all buffer slots are full. Analogously, the condition notempty is used by the consumer to wait when all buffer slots are empty.
+
+A counter, full_slots, initially set to 0, is used to keep track of how many slots are full. The counter is incremented by the producer and decremented by the consumer during each call to the monitor.
+
+participation activity
+4.4.3: Operation of the bounded buffer monitor.
+
+ monitor bounded_buffer condition notempty, notfulldeposit(data) {if (full_slots == n) notfull.waitplace data into bufferfull_slots = full_slots + 1notempty.signalremove(data) {if (full_slots == 0) notempty.waitremove data from bufferfull_slots = full_slots - 1notfull.signal}}buffer[n]notfullnotemptyc1p1p2p3 0 < full_slots < n  full_slots = n  full_slots = 1  full_slots = 0 c2
+
+Captions
+The buffer is an array accessible via the functions deposit and remove. Initially, all slots are empty (full_slots = 0)
+If a consumer process c1 calls remove(), then c1 becomes blocked on the notempty condition.
+A producer process p1 calls deposit(). Since free slots are available (full_slots != n), p1 places the data into the buffer, increments full_slots, and signals any process blocked on notempty.
+c1 reenters the remove() function, removes the data from the buffer, decrements full_slots, and signals the notfull queue. Since no process is blocked, the signal has no effect.
+If producers run ahead of consumers by n steps then all buffer slots become full. All subsequent producers become blocked on notfull until at least one slot becomes empty again.
+A subsequent removal triggers the first blocked producer to reenter and complete the deposit.
+As long as full_slots is greater than 0 and less than n, all producers and all consumers will proceed without entering the notfull or notempty queues.
+
+participation activity
+4.4.4: Conditions for waiting.
+1)
+The producer may proceed when full_slots _____
+2)
+The consumer may proceed when full_slots _____
+
+participation activity
+4.4.5: Critical sections within the monitor code.
+Although the code segments "place data into buffer" and "remove data from buffer" exist in the monitor, the statements require further protection to prevent multiple processes from manipulating the buffer array simultaneously.
+
+Monitors with priority waits
+Normally a queue associated with a conditional variable is processed in FIFO order. Some applications require additional control over the order of process reactivation.
+
+A priority wait has the form c.wait(p), where c is a conditional variable and p is an integer specifying a priority according to which processes blocked on c are reactivated.
+
+participation activity
+4.4.6: Operation of the alarm clock monitor.
+
+ monitor alarm_clock }tick() { now = now + 1wakeup.signal}wakeme(n) {alarm_setting = now + nwhile (now < alarm_setting)wakeup.signal hardware wakeupwakeup.wait(alarm_setting)alarm_setting valuescondition wakeupwakeup.wait11p213p1now = 10;now = 0;now = 11;p311
+
+Captions
+A monitor alarm_clock provides a facility for processes to get blocked for n number of time ticks by calling the function wakeme(n). The shared variable now, initially 0, keeps the current time.
+A condition variable wakeup is provided for processes to await the time to wake up.
+If p1 calls wakeme(3) at time now = 10, then p1's alarm_setting = 10 + 3 = 13. Since now is less than alarm_setting, p1 is blocked on the wakeup queue.
+Similarly, if p2 and p3 call wakeme(1) at time now = 10, then p2's and p3's alarm_setting = 10 + 1 = 11. Since now is less than alarm_setting, p2 and p3 are also blocked on the wakeup queue.
+A hardware interrupt periodically calls the function tick, which increments the current time, now, by 1. The function then issues a signal to the first process blocked on the wakeup queue.
+The problem is that p1 would wake up before p2 and p3, even though p2's and p3's alarm settings are lower (11) than p1's alarm setting (13).
+When priority waits are used, where alarm_setting is the priority, all processes are sorted in increasing order of alarm_setting.
+The next tick increments now to 11 and the signal reactivates p2. Since now = alarm_setting, p2 exits the while loop and leaves the monitor.
+Before leaving the monitor, p2 issues a wakeup.signal to assure that, if the next blocked process (p3) has the same alarm_setting as p2, the process is reactivated before the next tick is called.
+p3's alarm setting is equal to now and thus p3 leaves the monitor. p1 awaits 2 more ticks until now = 13.
+
+participation activity
+4.4.7: Timing in the alarm_clock monitor.
+Process p1 calls wakeme(5) at time now = 0
+Process p2 calls wakeme(5) at time now = 0
+Process p3 calls wakeme(3) at time now = 0
+Process p4 calls wakeme(1) at time now = 3
+Note: Assume that processes with the same priority are entered in FIFO order. Thus p1 is in front of p2.
+
+1)
+Process _____ leaves the monitor first.
+2)
+The function tick() will be invoked _____ times before the first process leaves.
+3)
+Process _____ leaves the monitor next.
+4)
+Process _____ leaves the monitor last.
+5)
+If the wakeup.signal was omitted from the wakeme() function then p2 would leave the monitor at time _____.
+
+participation activity
+4.4.8: Efficiency issues of the alarm clock monitor.
+1)
+The process at the head of the wakeup queue may have to reenter the wakeme function and become blocked again multiple times before being able to leave the monitor.
+2)
+There is no need to implement the urgent queue in the alarm_clock monitor.
+
+Implementation of a monitor
+A compiler or preprocessor uses P and V operations on semaphores to enforce the different features of a monitor.
+
+A semaphore mutex (initialized to 1) is used to enforce mutual exclusion among the functions.
+A semaphore c (initialized to 0) is used for each condition variable c to allow a process to block itself on the condition.
+A semaphore urg (initialized to 0) is used to block a process executing a signal operation.
+Associated with each semaphore c is a counter c_cnt, which keeps track of the number of processes blocked on c.
+Associated with the semaphore urg is a counter urg_cnt, which keeps track of the number of processes blocked on urg.
+The compiler then replaces each function body and all wait and signal operations with the corresponding segment of code:
+
+Function body:
+P(mutex)
+function body
+if (urg_cnt > 0) V(urg) 
+   else V(mutex)
+c.wait:
+c_cnt = c_cnt + 1
+if (urg_cnt > 0) V(urg) 
+   else V(mutex)
+P(c)
+c_cnt = c_cnt - 1
+c.signal:
+if (c_cnt > 0)
+   urg_cnt = urg_cnt + 1
+   V(c)
+   P(urg)
+   urg_cnt = urg_cnt - 1
+participation activity
+4.4.9: Implementing a function of the bounded buffer monitor.
+
+ monitor bounded_buffer condition notempty, notfulldeposit(data) {if (full_slots == n)  notfull.waitplace data into bufferfull_slots = full_slots + 1notempty.signalremove(data) {}}deposit(data) {P(mutex)}if (urg_cnt > 0) V(urg)if (full_slots == n)notfull_cnt = notfull_cnt + 1if (urg_cnt > 0) V(urg)else V(mutex)else V(mutex)P(notfull)notfull_cnt = notfull_cnt - 1place data into bufferfull_slots = full_slots + 1if (notempty_cnt > 0) urg_cnt = urg_cnt + 1V(notempty)P(urg)urg_cnt = urg_cnt - 1...
+
+Captions
+The compiler is implementing the function deposit() of the bounded buffer monitor.
+The compiler first inserts the code to enforce mutual exclusion. P(mutex) guarantees that only one process can be executing the function.
+Before exiting the function, the process must release mutex or, if another process is blocked on the urgent queue (urg_cnt > 0), then the blocked process is reactivated using V(urg).
+The compiler then replaces the notfull.wait and notempty.signal instructions with the corresponding code segments.
+Before blocking itself on P(notfull), the process releases mutex or, if the urgent queue is not empty (urg_cnt > 0), the current process reactivates the first process from the urgent queue.
+To record that one more process is blocked on the notfull queue, the process increments notfull_cnt prior to blocking itself. When the process resumes, notfull is again decremented.
+If a process is waiting in the notempty condition queue (notempty_cnt > 0) then the signaling process reactivates the waiting process and blocks itself on the urgent queue.
+The urg_cnt is incremented before the signaling process blocks itself and is again decremented when the process resumes.
+
+participation activity
+4.4.10: Implementation of wait and signal in the bounded buffer.
+How to use this tool
+notfull.signal
+notempty.signal
+notfull.wait
+notempty.wait
+notfull_cnt = notfull_cnt + 1
+if (urg_cnt > 0) V(urg) else V(mutex)
+P(notfull)
+notfull_cnt = notfull_cnt - 1
+if (notempty_cnt > 0)
+   urg_cnt = urg_cnt + 1
+   V(notempty)
+   P(urg)
+   urg_cnt = urg_cnt - 1
+notempty_cnt = notempty_cnt + 1
+if (urg_cnt > 0) V(urg) else V(mutex)
+P(notempty)
+notempty_cnt = notempty_cnt - 1
+if (notfull_cnt > 0)
+   urg_cnt = urg_cnt + 1
+   V(notfull)
+   P(urg)
+   urg_cnt = urg_cnt - 1
+
+
+participation activity
+4.4.11: Number of semaphores needed.
+1)
+The monitor implementation must use a different mutex semaphore for each function.
+2)
+The monitor implementation must use a different semaphore for each condition c.
+3)
+Each function has a separate urgent queue for processes blocked as a result of a signal operation.
+4)
+All semaphores are initialized to 0.
+
+challenge activity
+4.4.1: Bounded buffer monitor.
+764382.5329120.qx3zqy7
+Consider the monitor solution to the bounded buffer monitor. Determine the value of the variable full_slots and the number of processes waiting in the queues notfull and notempty after each of the following sequences of operations. Assume buffer size is n = 1.
+Operations	full_slots	  notfull 	 notempty 
+Initially	0	0	0
+1.	deposit(data);			
+2.	deposit(data);
+deposit(data);
+
+
+Ex: 5
+1
+2
+3
+4
+1
+2
+3
+4
+
+Exercise
+4.4.1: Tracing a monitor execution.
+
+A process invokes the function m.A() in the monitor m. While the process is executing inside the function A, the following calls are issued by different processes:
+m.A(); m.B(); m.B(); m.B(); m.B(); m.A(); m.A();
+
+   monitor m {
+      int x = 10, y = 2
+      condition c
+      A() {
+(1)      x++
+(2)      c.signal
+(3)      y = x - 2
+      }
+      B() {
+(4)      if (x > 10) {
+(5)         x--
+         }
+         else {
+(6)         c.wait
+(7)         x--
+         }
+      }
+   }
+(a)
+Using the line numbers in the code, trace the sequence of instruction execution. Show any changes of x and y at the end of each instruction.
+
+
+Exercise
+4.4.2: Bounded stack monitor.
+
+(a)
+Write a monitor to implement a bounded stack, b_stack, which may contain at most max elements. The push and pop operations behave as follows:
+
+stack.push(x): If the stack is not completely full, the operation pushes the new element x on top of the stack. Otherwise, the operation has no effect and the value of x is discarded.
+stack.pop(x): If the stack is not completely empty, the operation removes the value currently on top of the stack and returns the value in the variable x. If the stack is empty, the operation waits until a value has been pushed on the stack and then completes the pop.
+
+Exercise
+4.4.3: Emulate bounded semaphores.
+
+A bounded semaphore s is a general semaphore that cannot exceed a given value smax. The corresponding operations PB and VB are defined as:
+
+PB(s): wait until s > 0; then decrement s by 1.
+VB(s): wait until s < smax; then increment s by 1.
+(a)
+Write a monitor, s, such that the calls s.PB() and s.V B() emulate the operations on a bounded semaphore.
+
+
+Exercise
+4.4.4: Implementation of a monitor function.
+
+Assume the following function is part of a monitor:
+
+f(x) {
+   if (x) c1.wait
+   x = x + 1
+   c2.signal
+   x = 0
+}
+(a)
+Translate the code using P and V operations to enforce the requirements of a monitor.
+
+
+Exercise
+4.4.5: A simplified monitor implementation.
+
+The signal operation is the last operation of both functions in the bounded buffer monitor. Consequently, there is no need for the signaling process to block on the urgent queue since, upon reentry, the process would just exit the function.
+
+(a)
+Simplify the implementation of the bounded buffer monitor by eliminating the urgent queue.
+
+
+Exercise
+4.4.6: Wait/signal vs wait/notify.
+
+A different version of a monitor, developed for the programming language Mesa, replaces the primitive "signal" with "notify", which does not block the invoking process on the urgent queue but allows the process to finish the current function. As a result, a process is able to execute multiple "notify" statements before exiting a function.
+
+Two processes, p1 and p2, call the function f() in the following monitor and since x < 0, both become blocked on c. A process p3 calls g() and notifies both p1 and p2 that x is now greater than 0.
+
+
+monitor M {
+   x = -1
+f() {
+   ...
+   if (x < 0) c.wait
+   ...
+   x = h(x)
+   ...
+}
+g() {
+   ...
+   x = 1
+   c.notify
+   c.notify
+   ...
+}
+(a)
+What could go wrong with this code and yield incorrect results?
+
+(b)
+How could the program be modified to avoid the problem?
+
+
+Exercise
+4.4.7: Implementing signal and notify.
+
+(a)
+Show how the Mesa monitors introduced in the previous exercise can be implemented using P and V operations. In particular, show the implementation of each function body within the monitor and the implementations of the two operations c.signal and c.notify.
+
+
+How was this section?
+
+|
+
+
+Provide section feedback

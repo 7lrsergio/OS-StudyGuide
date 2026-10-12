@@ -1,0 +1,265 @@
+Skip to main content
+
+zybooks
+My library >
+CSCE 36103: Operating Systems home >
+4.3: Implementation of semaphores
+zyBooks catalog
+Help/FAQ
+Notifications
+Sergio Lopez Rios
+4.2 Semaphores
+Students:
+Section 4.3 is a part of 2 assignments:
+RD4
+This assignment's due date has passed. Activity will still be recorded, but will not count towards this assignment (unless the due date is changed). See this article for more info.
+
+Activities:
+P
+Participation
+Due: 09/17/2026, 11:59 PM CDT
+4.3 Implementation of semaphores
+Hardware support for synchronization
+Most contemporary computer architectures offer hardware support for process synchronization in the form of specialized machine instructions.
+
+The test-and-set instruction (TS) copies a variable into a register and sets the variable to zero in one indivisible machine cycle. Test-and-set has the form TS(R, x) where R is a register and x is a memory location and performs the following operations:
+
+Copy x into R
+Set x to 0
+A lock is a synchronization barrier through which only one process can pass at a time. TS allows an easy implementation of a lock.
+
+participation activity
+4.3.1: A lock using TS instruction.
+
+ Process p1  Process p2 do TS(R1, x) while (R1 == 0)do TS(R2, x) while (R2 == 0) Process p3 x = 1......⇦00⇦00...1⇦10next instructionnext instructionR1R2x??000
+
+Captions
+Two processes, p1 and p2, share a lock, implemented using a TS instruction on a shared variable x. R1 is a register of p1 and R2 is a register of p2.
+Initially, x = 0, implying that neither process may pass the lock. The initial values of R1 and R2 are irrelevant at this time.
+Process p1 executes TS, which copies x into R1 and sets x = 0. Since R1 remains 0, p1 continues executing the while-loop repeatedly.
+Similarly, the TS of p2 copies x into R2 and sets x = 0. Since R2 is 0, p2 also keeps executing the while-loop repeatedly.
+Both p1 and p2 are waiting inside the respective while-loops for the lock to open.
+Later a third process p3 opens the lock by writing a 1 into x.
+Whichever process reaches TS first, copies the 1 into the register and sets x back to 0. Here p1 executed TS first.
+Since R1 = 1, process p1 passes the lock and continues with the next instruction while process p2 remains in the while-loop executing TS.
+
+participation activity
+4.3.2: Changes to R and x using TS.
+1)
+If R = 1 and x = 0, then after executing TS(R, x) the values become _____.
+2)
+If R = 0 and x = 1, then after executing TS(R, x) the values become _____.
+3)
+If R = 2 and x = 1, then after executing TS(R, x) the values become _____.
+
+participation activity
+4.3.3: Values of R and x.
+1)
+R must be 0 initially for the lock to work correctly.
+2)
+When x = 0, no process can pass the lock.
+3)
+Once a process passes the lock, x immediately becomes ______.
+4)
+The lock using the TS instruction would work equally well if all 0's were replaced by 1's and vice versa, including TS setting x to 1 instead of 0.
+
+Binary semaphores
+Many synchronization problems do not require the full power of a general semaphore.
+
+A binary semaphore can take only the values 0 or 1. Pb and Vb are the simplified P and V operations that manipulate binary semaphores. Pb and Vb on the binary semaphore sb can be implemented directly using the TS instruction:
+
+Vb(sb): sb = 1
+Pb(sb): do TS(R,sb) while R == 0
+Busy-waiting is the act of repeatedly executing a loop while waiting for some condition to change. Busy-waiting consumes CPU resources and should be avoided whenever possible. The implementation of Pb(sb) using TS is very simple but suffers from the drawback of busy-waiting.
+
+participation activity
+4.3.4: Synchronization problems using binary semaphores.
+
+while (1) {
+   
+    Pb(full)
+  
+    remove data
+    from buffer
+
+    Vb(empty)
+
+    process data
+}while (1) {
+
+    produce data
+  
+    Pb(empty)
+
+    place data
+    into buffer
+  
+    Vb(full)
+}while (1) {
+    ...
+    Pb(mutex)
+
+    CS
+
+    Vb(mutex)
+    ...
+}while (1) {
+    ...
+    Pb(mutex)
+
+    CS
+
+    Vb(mutex)
+    ...
+} Producer  Consumer  Process p1  Process p2 ...Initially: mutex = 1Initially: empty = 1, full = 0 Critical section (CS) problem  Bounded buffer problem 
+
+Captions
+The single semaphore used in the CS problem never exceeds the value 1. Therefore, a binary semaphore, mutex, with the corresponding Pb and Vb operations, is sufficient to solve the problem.
+Only one process at a time can pass the Pb(mutex) operation.
+If p1 enters, p2 remains blocked until p1 executes Vb(mutex).
+When p1 executes Vb(mutex), p2 can enter CS.
+In the bounded buffer problem, if the buffer consists of only a single slot, then two binary semaphores, empty and full, are sufficient.
+Initially, empty is 1 and full is 0. Thus only the producer can continue while the consumer is blocked.
+When data has been placed into the buffer, full becomes 1 and the consumer can continue while the producer is blocked.
+
+participation activity
+4.3.5: Effect of busy-waiting on performance.
+A process p executes a CS in 5 units of time when running alone on a CPU. When 9 other processes, all time-sharing the same CPU, are trying to enter the CS simultaneously, p needs _____ total time units to execute the CS. (Assume that the quantum Q is much smaller than the time to execute the CS.)
+
+participation activity
+4.3.6: Effect of busy-waiting on performance.
+Placing a data item into the buffer takes 10 ms when executed in isolation. Similarly, the removal of a data item takes 10 ms. (Assume that the quantum Q is much smaller than the time to execute the CS.)
+
+When the producer and the consumer run concurrently on one CPU and the producer begins filling the buffer at time t, the consumer will finish emptying the buffer at time _____.
+
+Implementing P and V operations on general semaphores
+A general semaphore s can be implemented using a regular integer variable manipulated by the functions P(s) and V(s). To guarantee that only one operation at a time can access and manipulate s, a binary semaphore is used.
+
+The variable s serves a dual purpose:
+
+When s is greater or equal 0, s represents the value of the semaphore.
+Whenever s falls below 0, the absolute value of s represents the number of processes blocked on the semaphore.
+To avoid busy-waiting inside P(s) when s falls below 0, the process performs a blocking request, which places the process on a waiting list associated with s. A V(s) operation increments s and reactivates one process if one or more are blocked on s.
+
+participation activity
+4.3.7: Implementation of general semaphores.
+
+waiting listsP(s)  {Pb(ms)s = s - 1if (s < 0)Vb(ms)block self on sVb(ms)}V(s)  {Pb(ms)s = s + 1if (s <= 0)reactivate a processVb(ms)}p1p201-1-2else
+
+Captions
+The implementation of P and V uses an integer s to represent the semaphore. A waiting list is associated with s, where blocked processes wait for s > 0.
+P(s) decrements s in a critical section implemented using the binary semaphore ms. If s < 0, the process blocks itself after releasing the critical section.
+V(s) increments s in a critical section implemented using the same semaphore ms. If s <= 0 then one or more processes are blocked on s. One process is reactivated, still in critical section.
+If s = 1 initially, a process p1 decrements s. Since s is not less than 0, the process completes the P operation and leaves.
+If p1 repeats the same P operation, s becomes -1, and the process blocks itself on s. The value s = -1 indicates that 1 process is blocked.
+When another process, p2, tries to pass the P operation, s is again decremented and p2 becomes blocked on s. The value s = -2 indicates that 2 processes are blocked.
+A subsequent V operation increments s. Since s is less than or equal 0, V reactivates p1 from the waiting list, which exits the critical section and continues executing.
+Another V(s) operation reactivates p2, leaving the waiting list empty and the semaphore equal to 0.
+One more V(s) operation only increments s again but no process is reactivated.
+
+Note on implementation issues
+The implementation is only in pseudocode, which hides a number of subtle details. In particular, the function “reactive a process” may have to wait for a process to be on the waiting list, even though s <= 0. The situation can occur when a context switch happens just after the instruction Vb(ms) in P(s) but before “block self on s” had a chance to place the process on the waiting list. Another common solution to the problem is to disable interrupts during the execution of the P and V operations.
+participation activity
+4.3.8: Implementation issues of P and V on general semaphores.
+1)
+Allowing the variable s to become negative violates the definition of a semaphore.
+2)
+s can be initialized to any integer value.
+3)
+s = -5 means that 5 processes executed P(s) when s was less or equal 0 and thus became blocked on s.
+4)
+s = 0 implies that the waiting list on s is empty.
+5)
+The waiting list of processes blocked on a semaphore can become arbitrarily long.
+6)
+Decrementing and testing s in P(s) is a critical section.
+7)
+The operation Vb(ms) in P(s) could safely be moved after the operation "block self on s".
+
+challenge activity
+4.3.1: Implementation of general semaphores.
+764382.5329120.qx3zqy7
+Consider the following implementation of the P and V operations:P(s)  {
+      Pb(ms)
+      s = s - 1
+      if (s < 0)
+            Vb(ms)
+            block self on s
+      Vb(ms)
+}V(s) {
+      Pb(ms)
+      s = s + 1
+      if (s <= 0)
+            reactivate a process
+      else
+            Vb(ms)
+}If the semaphore value is s = 7, determine the values of s and ms after executing P(s):s = ms = 
+Ex: 9
+1
+2
+3
+4
+1
+2
+3
+4
+
+Exercise
+4.3.1: Implementation of general semaphores.
+
+In the implementation of general semaphores, some of the Vb operations are executed only conditionally. Label the Pb and Vb operations as shown below and determine which Pb/Vb pair is executed in each of the three cases:
+
+Two blocks of pseudo code. Block 1: P(s){ pb(ms) s=s-1 if(s less than 0) {Vb(ms) block self on s} Vb(ms)}  Block 2: V(s){ Pb(ms) s=s+1 if (s less or equal 0) reactivate a process else Vb(ms)}  Labels Pb1, Vb1, Vb2, Pb2, and Vb3 are in front of the Pb and Vb operations throughout the pseudocodes in the order of appearance.  
+(a)
+P(s) is executed when s > 0
+
+(b)
+V(s) is executed when s >= 0
+
+(c)
+P(s) is executed when s <= 0, followed by a V(s)
+
+
+Exercise
+4.3.2: Other instructions to implement binary semaphores.
+
+(a)
+A machine instruction SWAP(R, x) interchanges the contents of the register R and the memory location x in one instruction cycle. Implement the Pb and Vb operations on binary semaphore using SWAP.
+
+(b)
+A machine instruction Test-Set-Branch, TSB(x, L), where x is a memory location and L is a branch label, performs the following function in one instruction cycle:
+if (x == 0) branch to L else x = 0
+Implement the Pb and Vb operations on binary semaphore using TSB .
+
+
+Exercise
+4.3.3: A different implementation of P and V.
+
+The following implementation of P and V uses busy-waiting inside P. Rather than blocking the process when s is less or equal 0, the process is prevented from continuing by executing Pb(ds), where ds is a binary semaphore initialized to 0. A V(s) then unblocks a process by performing Vb on the binary semaphore ds.
+
+P(s) {
+   Pb(ms)
+   s = s - 1
+   if (s < 0)
+      Vb(ms)
+      Pb(ds)
+   Vb(ms)
+}
+V(s) {
+   Pb(ms)
+   s = s + 1
+   if (s <= 0)
+      Vb(ds)
+   else
+      Vb(ms)
+}
+(a)
+Since the original solution also uses Pb and Vb (implemented using busy-waiting), why is the above solution much worse in terms of performance?
+
+
+How was this section?
+
+|
+
+
+Provide section feedback

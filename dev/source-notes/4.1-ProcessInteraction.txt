@@ -1,0 +1,235 @@
+
+4.1: Process interactions
+
+Activities:
+P
+Participation
+Due: 09/17/2026, 11:59 PM CDT
+4.1 Process interactions
+Process competition
+Concurrency is the act of multiple processes (or threads) executing at the same time. When multiple physical CPUs are available, the processes may execute in parallel. On a single CPU, concurrency may be achieved by time-sharing.
+
+When concurrent processes access a common data area, the data must be protected from simultaneous change by two or more processes. Otherwise the updated area may be left in an inconsistent state.
+
+A critical section is a segment of code that cannot be entered by a process while another process is executing a corresponding segment of the code.
+
+participation activity
+4.1.1: The critical section problem.
+
+
+
+process pprocess qx = x + 1x = x + 2                                                 // load contents of variable x into register R
+                                               //add constant c to register R
+                                               // store contents of R into xload Rp, xadd Rp, 1store Rp, xload Rq, xadd Rq, 2store Rq, xload Rp, xadd Rp, 1store Rp, xload Rq, xadd Rq, 2store Rq, xRpxRpxRq0011133RqSequential executionInterleaved execution0001212Source code    Machine code            load R, x
+add R, c
+store R, xx = x + c
+
+Captions
+A source code instruction x = x + c is compiled into 3 machine-level instructions using a CPU register R.
+Process p executes the instruction x = x + 1. Process q executes the instruction x = x + 2.
+If the initial value of x is 0 and p executes the code first then p loads 0 into Rp, increments Rp by 1, and stores the result back into x.
+If q executes next then q loads the updated value of x into Rq, increments Rq by 2, and stores the value back into x. The final value of x is 3 as expected.
+Context switching can interleave the execution of p and q. First p loads the initial value of x = 0 into Rp.
+Next, q loads the same initial value x = 0 into Rq.
+Next, p increments Rp by 1 and q increments Rq by 2.
+Finally, p stores the value of Rp = 1 into x but q overwrites the value with Rq, which is 2. The update of x by p has been lost, resulting in an incorrect result.
+The sequence of the 3 instructions corresponding to the source code instruction x = x + c is a critical section and must not be interleaved.
+
+participation activity
+4.1.2: Incorrect interleaving of code.
+Processes p and q execute the instructions x = x + 1 and x = x + 2, respectively. Initially x = 0. After execution of the interleaved code, x = _____.
+
+1)
+p:          q:
+load Rp,x
+            load Rq,x
+add Rp,1
+            add Rq,2
+            store Rq,x
+store Rp,x
+
+    
+
+
+Show answer
+2)
+p:          q:
+            load Rq,x
+load Rp,x
+add Rp,1
+            add Rq,2
+store Rp,x
+            store Rq,x
+
+    
+
+
+Show answer
+3)
+p:          q:
+load Rp,x
+add Rp,1
+            load Rq,x
+            add Rq,2
+            store Rq,x
+store Rp,x
+
+    
+
+
+Show answer
+
+A software solution to the CS problem.
+Any solution to the critical section (CS) problem must satisfy the following requirements:
+Guarantee mutual exclusion: Only one process may be executing within the CS.
+Prevent lockout: A process not attempting to enter the CS must not prevent other processes from entering the CS.
+Prevent starvation: A process (or a group of processes) must not be able to repeatedly enter the CS while other processes are waiting to enter.
+Prevent deadlock: Multiple processes trying to enter the CS at the same time must not block each other indefinitely.
+In the following solution, a process indicates the interest to enter the CS by setting the variable c1 or c2 to 1. A third variable, will_wait, is used to break the tie if both processes try to enter CS simultaneously.
+participation activity
+4.1.3: A software solution to the critical section problem.
+
+c1c2will_wait0011?12while (1) {c1 = 1will_wait = 1while (c2 && (will_wait==1)) /*wait*/CSc1 = 0while (1) {c2 = 1will_wait = 2while (c1 && (will_wait==2)) /*wait*/CSc2 = 0 Process p1  Process p2 }}
+
+Captions
+Processes p1 and p2 share a critical section CS. The initial values of c1 and c2 are 0. The initial value of will_wait is irrelevant.
+Mutual exclusion is guaranteed. When both processes execute concurrently, c1 and c2 are both set to 1. But will_wait can only have one value, 1 or 2. The memory hardware does the writes in sequence.
+If p1 writes first, p2's subsequent write makes will_wait = 2. p1 wins the race and enters CS while p2 waits.
+Deadlock is prevented for the same reason that guarantees mutual exclusion. When both processes enter the wait loop, one will always pass through because will_wait can only be 1 or 2.
+Lockout is also not possible. When p2 is not trying to enter CS, c2 = 0. Consequently, p1 may enter CS repeatedly, regardless of the value of will_wait.
+Finally, starvation is also not possible. When p1 is in CS and p2 is in the wait loop, both c1 = c2 = 1 and will_wait = 2.
+If p1 wants to execute CS again, p1 must first set will_wait = 1.
+Since will_wait = 1, p1 must wait while p2 enters CS. Thus p1 cannot starve p2 by entering CS repeatedly.
+
+participation activity
+4.1.4: Possible values of the variables.
+1)
+When p1 is in CS, the value of c1 can be 0.
+2)
+When p1 is in CS, the value of will_wait can be 0.
+3)
+When p1 is in CS, the value of will_wait can be 1.
+4)
+When p1 is in CS, the value of will_wait can be 2.
+
+participation activity
+4.1.5: An incorrect solution 1.
+p1 executes the code:
+while (1) {
+   while (turn==2) /*wait*/
+   CS
+   turn = 2
+   ...
+}
+p2 executes the code:
+while (1) {
+   while (turn==1) /*wait*/
+   CS
+   turn = 1
+   ...
+}
+Assuming the variable turn is initialized to 1 or 2, which requirement is violated in the above solution?
+
+participation activity
+4.1.6: An incorrect solution 2.
+p1 executes the code:
+while (1) {
+   c1 = 1
+   while (c2) /*wait*/
+   CS
+   c1 = 0
+   ...
+}
+p2 executes the code:
+while (1) {
+   c2 = 1
+   while (c1) /*wait*/
+   CS
+   c2 = 0
+   ...
+}
+Which requirement is violated in the above solution?
+
+Process cooperation
+In addition to the CS problem, where processes compete for access to a shared resource, many applications require the cooperation of processes to solve a common goal. A typical scenario is when one process produces data needed by another process. The producer process must be able to inform the waiting process whenever a new data item is available. In turn, the producer must wait for an acknowledgement from the consumer, indicating that the consumer is ready to accept the next data item.
+
+participation activity
+4.1.7: Producer-consumer synchronization.
+
+produce first data itemplace data into buffermark buffer as fullwait for buffer emptywait for buffer fullremove data from buffermark buffer as emptyprocess data Producer
+ process Consumer
+  processbuffer.....................produce next data item
+
+Captions
+A producer and a consumer process cooperate by sharing a buffer, which can hold one data item.
+The producer produces the first data item, places the data item into the buffer, and marks the buffer as full.
+The consumer process must wait until the buffer has been filled.
+The producer can now produce the next data item but must not overwrite the buffer until the consumer has removed the previous data item.
+The consumer removes the data item from the buffer and marks the buffer as empty.
+While the consumer processes the last data item, the producer can start placing the next data item into the buffer.
+After processing the data item, the consumer goes back to wait for the buffer to become full again to start the next production-consumption cycle.
+
+participation activity
+4.1.8: Possible overlap between the producer and the consumer.
+Which code segments could never be executing simultaneously?
+
+participation activity
+4.1.9: The consumer-producer problem vs the critical section problem.
+1)
+The buffer is a critical section.
+2)
+The code segments "place data into buffer" and "remove data from buffer" are critical sections because both access the shared buffer. Thus the software solution to the critical section problem is sufficient to also solve the producer-consumer problem.
+
+Exercise
+4.1.1: Possible code interleaving.
+
+A process executes the sequence of machine-level instructions s1, s2, and s3. Another process executes the sequence r1 and r2.
+
+(a)
+Determine all possible interleavings of the instructions when the processes run concurrently.
+
+
+Exercise
+4.1.2: Critical section.
+
+The following program is executed by 2 processes p and q concurrently:
+
+for i = 1; i <= 3; i++
+   x = x + 1
+
+The variable x is shared by the two processes.
+The instruction x = x + 1 is compiled into 3 machine instructions to load x into a register, increment the register value, and store the register back into x.
+(a)
+If x is initially 0, determine the expected value of x when both p and q terminate.
+
+(b)
+In the absence of any synchronization primitives, program interleaving can result in a loss of 1 or more of the updates. Show one sequence instruction execution where the final value of x is less than the expected value.
+
+(c)
+Determine the smallest possible value that x can have at the end of the program due to lost updates resulting from arbitrary code interleaving.
+
+
+Exercise
+4.1.3: Effect of interchanging the role of will_wait.
+
+Modify the solution to the CS problem by reversing the will_wait assignment: p1 sets will_wait = 2 and p2 sets will_wait = 1. Thus each process, rather than expressing willingness to wait, states that the other process should wait if necessary.
+
+(a)
+Which of the 4 requirements will be violated?
+
+
+Exercise
+4.1.4: Potential concurrency in the producer-consumer problem.
+
+.
+
+(a)
+Assume that the code segments "produce data item", "place data into buffer", "remove data from buffer", and "process data" all take the same time. Show which code segments will be executing concurrently for the first 3 cycles of filling/emptying the buffer.
+
+
+How was this section?
+
+|
+
+
+Provide section feedback

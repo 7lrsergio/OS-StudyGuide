@@ -1,0 +1,100 @@
+
+PAGE 1
+Page 1 of 3 
+ 
+Module 3: Scheduling 
+9/2/202 6 
+Copyright © 2026 by Dale Thompson {d.r.thompson@ieee.org} 
+Goal/Assessment  
+Goal 
+Where are we going? What is expected? What will the student be able to do, know, and 
+value at the end? 
+The student will be able to describe various scheduling algorithms. 
+Assessment 
+How do we measure? How will the student be assessed in the lessons and at the end of 
+the module? Use general terms. Present this to the student at the beginning of the 
+module. 
+A student should be able to: 
+• Differentiate between long-term and short-term scheduling. 
+• Differentiate between preemptive and non-preemptive scheduling. 
+• Describe priority for short-term scheduling and long-term scheduling. 
+• Schedule a set of batch processes using First-In First-Out (FIFO) also known as 
+First-Come First-Serve (FCFS), Shortest Job First (SJF) also known as Shortest 
+Job Next (SJN), Shortest Remaining Time (SRT). 
+• Calculate estimated total CPU time using exponential averaging. 
+• Calculate turnaround time. 
+• Define starvation. 
+• Schedule a set of interactive processes using Round-Robin scheduling, 
+Multilevel scheduling, and Multilevel feedback algorithm. 
+• Describe effects of time quantum and context switch time on performance such 
+as response time or instructions per second. 
+• Describe issues for scheduling of real-time processes including the time interval 
+within each input must be processed. 
+• Schedule real-time processes using Rate Monotonic (RM) scheduling and 
+Earliest Deadline First (EDF) scheduling. 
+• Describe the performance of real-time process scheduling such as feasible 
+schedules and CPU utilization. 
+• Describe combined scheduling approaches such as the 2-tier approach and the 
+2-tier approach with floating priorities. 
+
+PAGE 2
+Page 2 of 3 
+ 
+• Calculate speedup gain using Amdahl’s Law. 
+Hook 
+Pique the student’s interest using a case study, interesting story, experiment, or 
+disaster. 
+Question: What is the best way determine which process goes first? 
+Lessons 
+Divide the module into logical lessons (4-5 days). Create lessons, activities, 
+experiments, homework and/or quizzes based on these grain size lessons. 
+Lesson: Principles of scheduling 
+Lesson: Scheduling of batch processes 
+Lesson: Scheduling of interactive processes 
+Lesson: Scheduling of real-time processes 
+Lesson: Combined approaches 
+Lesson: Amdahl’s Law 
+Representative Topics 
+• Long-term vs short-term scheduling, preemptive vs non-preemptive scheduling, 
+priority for short-term scheduling, priority for long-term scheduling, batch process, 
+First-In First-Out (FIFO) or First-Come First-Serve (FCFS), Shortest Job First 
+(SJF) also known as Shortest Job Next (SJN), Shortest Remaining Time (SRT), 
+Estimating total CPU (exponential averaging), turnaround time, starvation, 
+scheduling of batch processes with FIFO, SJF, and SRT, interactive process, 
+round-robin scheduling, time quantum, multilevel scheduling, multilevel feedback 
+algorithm (different Q and change priority dynamically), performance, response 
+time, effects of time quantum and context switch time, real-time process, period, 
+rate monotonic (RM) scheduling, earliest deadline first (EDF) scheduling, 
+performance, feasible schedule, CPU utilization (U), 2-tier approach, 2-tier 
+approach with floating priorities, Amdahl’s Law 
+
+PAGE 3
+Page 3 of 3 
+ 
+Culminating Activity 
+Tie it all together returning to the big idea. Go full circle. Create a culminating 
+experience that ties lessons back to the module theme. Create module-level rubric and 
+each topic is one of the lessons below. 
+Homework. 
+Assessment 
+Assess the results using tools such as paper/pencil, programming, simulation, 
+demonstration, experiments, and projects. Paper and pencil homework assesses what 
+you know. Programming, simulations, demonstrations, and projects assess what you 
+can do. 
+Assessment: 
+Reading assignments, homework, quizzes, and exam  
+Copyright Notice 
+This material is Copyright © 2026 by Dale Thompson. It may be freely redistributed in its 
+entirety provided that this copyright notice is not removed. It may not be sold for profit or 
+incorporated in commercial documents without the written permission of the copyright 
+holder. 
+Acknowledgment 
+Any opinions, findings, and recommendations or conclusions expressed in these 
+materials are those of the author. 
+Liability Release 
+The curriculum activities and lessons have been designed to be safe and engaging 
+learning experiences and have been field-tested with university students. However, due 
+to the numerous variables that exist, the author(s) does not assume any liability for the 
+use of this product. These curriculum activities and lessons are provided as is without 
+any express or implied warranty. The user is responsible and liable for following all 
+stated and generally accepted safety guidelines and practices. 

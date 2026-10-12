@@ -1,0 +1,368 @@
+/* Original, hypothetical anime training analogies; technical definitions remain authoritative. */
+window.FLASH_ANALOGIES = {
+  "Abstraction": {
+    "series": "Naruto",
+    "story": "Imagine Kakashi saying “begin the drill” instead of explaining every foot placement and hand movement.",
+    "connection": "One high-level command hides the lower-level steps; the steps still happen."
+  },
+  "Virtualization": {
+    "series": "Jujutsu Kaisen",
+    "story": "Imagine a training room that makes each student feel they have a private arena, while a coordinator alternates their turns in one real arena.",
+    "connection": "The apparent private resource differs from the shared physical resource. This is an imagined training setup, not a claim about domain mechanics."
+  },
+  "Kernel / privilege": {
+    "series": "Demon Slayer",
+    "story": "Imagine a training compound where only authorized instructors may unlock the weapon store. Trainees must request access.",
+    "connection": "Privileged operations require trusted authority; ordinary work does not grant that authority."
+  },
+  "System call / supervisor call": {
+    "series": "Naruto",
+    "story": "Imagine a ninja filling out a mission request, then handing it through the Hokage office’s designated service window.",
+    "connection": "Preparing the request is the wrapper; the controlled entry into the office is the supervisor call. A normal conversation is not a privilege change."
+  },
+  "Interrupt / trap": {
+    "series": "Demon Slayer",
+    "story": "Imagine an outside messenger interrupting Tanjiro’s drill, versus the instructor stopping him because of the move he just performed.",
+    "connection": "The external message resembles an interrupt; the current action triggering intervention resembles a trap."
+  },
+  "Shell": {
+    "series": "Naruto",
+    "story": "Imagine giving a mission coordinator a written sequence: gather supplies, assemble the team, then depart.",
+    "connection": "The coordinator interprets commands, like a shell; the coordinator is not the entire village administration."
+  },
+  "Multiprogramming": {
+    "series": "Demon Slayer",
+    "story": "Imagine Tanjiro waiting for equipment while Zenitsu uses the training floor.",
+    "connection": "Another ready task uses the available resource during someone else’s wait; waiting time need not leave the CPU idle."
+  },
+  "Time-sharing": {
+    "series": "Naruto",
+    "story": "Imagine Naruto and Sakura alternating timed turns at one training dummy even when neither has finished practicing.",
+    "connection": "Enforced turns resemble preemption and time slices; they do not create extra physical dummies."
+  },
+  "CPU-bound / I/O-bound": {
+    "series": "Jujutsu Kaisen",
+    "story": "Imagine one student spending nearly the entire drill performing moves, while another repeatedly waits for equipment to arrive.",
+    "connection": "Doing the moves represents CPU work; waiting for an external service represents I/O waiting."
+  },
+  "Byte / word": {
+    "series": "Demon Slayer",
+    "story": "Imagine supply beads bundled eight at a time, then placed into boxes whose capacity is specified by the training camp.",
+    "connection": "The eight-bit bundle is a byte; the machine-defined box is a word. Word size must be given, not assumed."
+  },
+  "Environments": {
+    "series": "Naruto",
+    "story": "Imagine a village archive optimizing bulk paperwork, a messenger station optimizing quick replies, and a defense post meeting strict warning deadlines.",
+    "connection": "Different missions imply different optimization goals, just as OS environments prioritize throughput, response, or deadlines."
+  },
+  "Evolution": {
+    "series": "Demon Slayer",
+    "story": "Imagine a growing training camp: one instructor first handles everything, then adds queues, rotating stations, personal kits, and communication between camps.",
+    "connection": "This is a memory aid for increasing coordination needs, not the literal history of computers. Learn the hardware-generation mapping from the definition."
+  },
+  "SaaS": {
+    "series": "Naruto",
+    "story": "Imagine ordering a finished meal at a village restaurant: you use the result without managing the kitchen.",
+    "connection": "You consume the completed application; the provider operates what makes it run."
+  },
+  "PaaS": {
+    "series": "Jujutsu Kaisen",
+    "story": "Imagine designing your own drill in a school-run arena where staff maintain the floor, lighting, and equipment systems.",
+    "connection": "You supply the application while the provider maintains its execution platform."
+  },
+  "IaaS": {
+    "series": "Demon Slayer",
+    "story": "Imagine renting an empty training hall and equipment, then choosing and maintaining the camp’s procedures yourself.",
+    "connection": "The provider supplies infrastructure; you take responsibility for the guest OS and application layers."
+  },
+  "Open source": {
+    "series": "Naruto",
+    "story": "Imagine a training scroll whose license permits studying, adapting, and sharing it. A scroll displayed behind glass grants only viewing.",
+    "connection": "Readable instructions alone are not enough: the permissions to modify and redistribute matter."
+  },
+  "Process / program": {
+    "series": "Naruto",
+    "story": "Imagine one written training routine practiced independently by Naruto and Sakura, each at a different step with separate supplies.",
+    "connection": "The routine is the program; each active practice is a process with its own state."
+  },
+  "Ready / running / blocked": {
+    "series": "Demon Slayer",
+    "story": "Imagine three trainees: one awaits a free floor, one practices on it, and one cannot proceed until a replacement sword arrives.",
+    "connection": "They are ready, running, and blocked respectively. A free floor cannot help the trainee still missing equipment."
+  },
+  "Context switch": {
+    "series": "Jujutsu Kaisen",
+    "story": "Imagine pausing Yuji’s drill, recording his current step and setup, then restoring Megumi’s saved drill setup.",
+    "connection": "Save the outgoing execution state before restoring the incoming one; switching is more than changing a name on a roster."
+  },
+  "New / suspended / terminated": {
+    "series": "Naruto",
+    "story": "Imagine missions awaiting admission, missions put on administrative hold, and completed missions retained for a debrief.",
+    "connection": "These differ from waiting for a resource; a suspended task needs explicit reactivation."
+  },
+  "Virtual CPU benefits": {
+    "series": "Demon Slayer",
+    "story": "Imagine the same training plan running in a camp with one shared floor or several floors, with coordinators managing the difference.",
+    "connection": "The plan can remain independent of physical resource count; fewer floors may still mean slower completion."
+  },
+  "PCB": {
+    "series": "Naruto",
+    "story": "Imagine a mission dossier recording the ninja’s current step, status, supplies, priority, and which mission launched it.",
+    "connection": "The PCB is the structured record of one process, not the process’s executable instructions."
+  },
+  "TCB": {
+    "series": "Jujutsu Kaisen",
+    "story": "Imagine a shared team mission with an individual bookmark and action log for each student.",
+    "connection": "Each thread needs its own control state while team-wide resources remain shared."
+  },
+  "Sibling representation": {
+    "series": "Naruto",
+    "story": "Imagine a team leader’s record naming the first recruit, while each recruit records the immediately earlier and later recruit.",
+    "connection": "Parent, first-child, and adjacent-sibling links reconstruct the hierarchy without a separately allocated child-list node for every relationship."
+  },
+  "Array vs pointers": {
+    "series": "Demon Slayer",
+    "story": "Imagine reserving a full equipment locker for every possible trainee versus reserving a small label and acquiring a locker only when needed.",
+    "connection": "Fixed records reserve space upfront; pointers to dynamically allocated records add allocation work but avoid reserving every full record."
+  },
+  "RCB": {
+    "series": "Demon Slayer",
+    "story": "Imagine a sword-rack ledger showing whether a particular practice sword is available and who is waiting for it.",
+    "connection": "An RCB records the resource and its waiters; a PCB records the process and what it owns."
+  },
+  "Request": {
+    "series": "Naruto",
+    "story": "Imagine Naruto requesting a training dummy already reserved by Sakura. He joins its queue while keeping his other supplies.",
+    "connection": "A failed request can block the caller without automatically releasing resources it already holds."
+  },
+  "Release": {
+    "series": "Demon Slayer",
+    "story": "Imagine Tanjiro returning the only practice sword and the attendant assigning it to the first waiting trainee.",
+    "connection": "Ownership transfers and the waiter becomes ready; that does not guarantee immediate CPU service."
+  },
+  "Ready list convention": {
+    "series": "Jujutsu Kaisen",
+    "story": "Imagine the instructor’s eligible roster includes both the student currently on the floor and students awaiting their turns.",
+    "connection": "That matches the course RL convention. A blocked student waiting for equipment is on a different list."
+  },
+  "Shared thread data": {
+    "series": "Naruto",
+    "story": "Imagine a team sharing one mission map and supply room, while each teammate keeps an individual action log.",
+    "connection": "Shared map and supplies resemble shared process data/resources; individual logs resemble private stacks and register state. Real threads are not isolated copies."
+  },
+  "User-level threads": {
+    "series": "Jujutsu Kaisen",
+    "story": "Imagine a student coordinator dividing a team into subgroups, but the school recognizes only one team admission pass. If that pass is held up, all subgroups wait.",
+    "connection": "In many-to-one mapping, the kernel sees one execution stream; a blocking call can stall all user threads mapped to it."
+  },
+  "Kernel-level threads": {
+    "series": "Demon Slayer",
+    "story": "Imagine camp staff tracking each trainee individually and assigning them to separate available training floors.",
+    "connection": "Kernel-visible threads can be scheduled independently, subject to the available CPUs."
+  },
+  "Pointer / pointee": {
+    "series": "Naruto",
+    "story": "Imagine two notes both giving the location of the same scroll. Changing the scroll affects what either note leads you to; changing one note’s address does not change the other.",
+    "connection": "The notes are pointers and the scroll is the pointee. Copying an address creates an alias, not another scroll."
+  },
+  "Thread completion": {
+    "series": "Demon Slayer",
+    "story": "Imagine Tanjiro lending teammates written instructions, then waiting for them to return before erasing the instructions or combining their reports.",
+    "connection": "Join before reclaiming argument storage or relying on completed results; launching work does not mean it has finished."
+  },
+  "Long-term / short-term": {
+    "series": "Naruto",
+    "story": "Imagine the village first admitting missions into today’s workload, then deciding which admitted mission gets the next available squad.",
+    "connection": "Admission is long-term scheduling; selecting among runnable work is short-term scheduling."
+  },
+  "Preemptive / nonpreemptive": {
+    "series": "Jujutsu Kaisen",
+    "story": "Imagine an instructor either stopping an ongoing drill for another student or allowing it to continue until it finishes or must wait.",
+    "connection": "The difference is whether runnable work can be displaced before it voluntarily stops."
+  },
+  "FCFS (FIFO)": {
+    "series": "Demon Slayer",
+    "story": "Imagine trainees using a practice station in arrival order, each keeping it until done.",
+    "connection": "Arrival order sets service order; a short drill behind a long drill still waits."
+  },
+  "SJF (SJN)": {
+    "series": "Naruto",
+    "story": "Imagine Kakashi picking the shortest predicted next drill among students already waiting, without interrupting the current student.",
+    "connection": "Compare the predicted next CPU bursts only when choosing a new job; a later short arrival does not preempt the current job."
+  },
+  "SRT": {
+    "series": "Jujutsu Kaisen",
+    "story": "Imagine an instructor always choosing the drill with the least work still unfinished, even stopping a longer drill when a shorter one arrives.",
+    "connection": "Compare remaining work, not original length or time spent waiting. A previously long job may now be almost finished."
+  },
+  "Starvation": {
+    "series": "Demon Slayer",
+    "story": "Imagine a trainee with a long drill always being passed over as new short drills arrive. Everyone else progresses, but that trainee never starts.",
+    "connection": "This is indefinite postponement, not necessarily a group trapped in circular waiting."
+  },
+  "Quantum Q": {
+    "series": "Naruto",
+    "story": "Imagine an instructor giving each ninja a maximum of two minutes on a shared dummy before rotating the queue.",
+    "connection": "The quantum is a service limit, not the task’s total requirement. Finishing early releases the station early."
+  },
+  "Multilevel (ML)": {
+    "series": "Demon Slayer",
+    "story": "Imagine separate priority lines at a training camp, with fair turns inside each line but service always taken from the highest nonempty line.",
+    "connection": "Fairness within one queue does not guarantee that lower-priority queues ever run."
+  },
+  "Multilevel feedback (MLF)": {
+    "series": "Naruto",
+    "story": "Imagine each new drill getting one minute first; unfinished drills then move to queues with two-minute and four-minute turns.",
+    "connection": "The queue responds to observed CPU use. The course doubles the time allotment as priority falls."
+  },
+  "Two-tier / floating priority": {
+    "series": "Jujutsu Kaisen",
+    "story": "Imagine urgent response drills above routine training, with returning students receiving a temporary boost based on why they were waiting.",
+    "connection": "Separate the fixed high tier from behavior-based priority. An event boost is added to base priority, not accumulated blindly on the current value."
+  },
+  "Period / deadline": {
+    "series": "Demon Slayer",
+    "story": "Imagine a guard reporting every ten minutes, with each report required before the next reporting interval ends.",
+    "connection": "Ten minutes is the period; each particular report has its own absolute deadline."
+  },
+  "Rate monotonic (RM)": {
+    "series": "Naruto",
+    "story": "Imagine recurring patrol reports every four and seven minutes. The four-minute report always gets higher priority.",
+    "connection": "RM ranks by the fixed period, regardless of which individual job currently has the nearer absolute deadline."
+  },
+  "Earliest deadline first (EDF)": {
+    "series": "Jujutsu Kaisen",
+    "story": "Imagine two training reports due at 10:05 and 10:08. The earlier due report takes priority, even if its usual reporting cycle is longer.",
+    "connection": "EDF ranks the deadlines of currently pending jobs, so priorities can change between releases."
+  },
+  "Feasible schedule": {
+    "series": "Demon Slayer",
+    "story": "Imagine a defense drill where every warning must reach its station before its assigned cutoff. Finishing most warnings quickly is not enough.",
+    "connection": "All deadlines must be met; averages and CPU utilization alone are not the definition of feasibility."
+  },
+  "Race condition": {
+    "series": "Naruto",
+    "story": "Imagine Naruto and Sakura both reading “10 supplies,” independently adding their deliveries, then each replacing the ledger total. The last entry can erase the other delivery.",
+    "connection": "A read-modify-write sequence can lose an update when interleaved; source-code appearance does not make it atomic."
+  },
+  "Critical section": {
+    "series": "Jujutsu Kaisen",
+    "story": "Imagine the short procedure that edits the school’s shared equipment ledger while everyone else must wait to edit it.",
+    "connection": "The critical section is the code performing the protected access, not the ledger object itself."
+  },
+  "Mutual exclusion": {
+    "series": "Demon Slayer",
+    "story": "Imagine a single editing token for the training roster: only its holder may change the roster.",
+    "connection": "At most one conflicting editor enters at a time. This alone does not guarantee fairness or that required data exists."
+  },
+  "Lockout prevention": {
+    "series": "Naruto",
+    "story": "Imagine Naruto cannot train because the roster insists it is Sakura’s turn, although Sakura is not trying to train.",
+    "connection": "An uninterested participant must not prevent an interested one from entering an available critical section."
+  },
+  "Deadlock / starvation": {
+    "series": "Demon Slayer",
+    "story": "Imagine two trainees each holding one tool and waiting for the other’s tool; compare that with one trainee repeatedly losing every equipment allocation.",
+    "connection": "The first is circular waiting with no progress; the second is starvation while others can continue."
+  },
+  "Priority inversion / inheritance": {
+    "series": "Jujutsu Kaisen",
+    "story": "Imagine an urgent mission waiting for a junior student’s locked equipment box, while routine drills keep delaying that student. Temporarily let the student finish first.",
+    "connection": "Boost the lock owner so it can release the needed resource; do not let the urgent task bypass mutual exclusion."
+  },
+  "Abstract P / V": {
+    "series": "Naruto",
+    "story": "Imagine three training passes. Taking a pass before entering is P; returning a pass is V. With no pass available, the next ninja waits.",
+    "connection": "Permits represent available capacity. Taking or returning must be indivisible relative to competing operations."
+  },
+  "Signed internal count": {
+    "series": "Demon Slayer",
+    "story": "Imagine an equipment board where +2 means two spare passes and −2 records two waiting trainees rather than negative physical swords.",
+    "connection": "A negative internal semaphore value represents queued demand; it is not the abstract number of usable permits."
+  },
+  "Mutex-style semaphore": {
+    "series": "Jujutsu Kaisen",
+    "story": "Imagine exactly one token for updating a shared mission board. Take it before editing and return it once afterward.",
+    "connection": "Initialize to one and balance acquire/release. Fair access requires an appropriate admission policy as well."
+  },
+  "Busy waiting": {
+    "series": "Naruto",
+    "story": "Imagine Naruto repeatedly asking “is the dummy free?” instead of waiting to be called while another trainee finishes.",
+    "connection": "Polling consumes execution time without advancing the waiting task; blocking lets other runnable work use that time."
+  },
+  "Lost wakeup": {
+    "series": "Demon Slayer",
+    "story": "Imagine the attendant calling “your sword is ready” just before a trainee joins the waiting line. The trainee then waits for a call that already happened.",
+    "connection": "Registration and sleeping must coordinate with notification so the wakeup cannot fall into the gap."
+  },
+  "Monitor": {
+    "series": "Jujutsu Kaisen",
+    "story": "Imagine an equipment office whose inventory can be changed only through its counter, serving one transaction at a time with a separate waiting area.",
+    "connection": "Encapsulation controls access; mutual exclusion protects operations; condition waiting frees the counter for someone else."
+  },
+  "Condition wait": {
+    "series": "Naruto",
+    "story": "Imagine stepping away from the mission counter to wait for a missing document, allowing other ninjas to use the counter.",
+    "connection": "A condition wait relinquishes monitor ownership while blocking; it does not consume a stored semaphore permit."
+  },
+  "Condition signal": {
+    "series": "Demon Slayer",
+    "story": "Imagine an attendant calling the next trainee in a waiting line. If nobody is waiting, that call is not saved as a ticket for a future arrival.",
+    "connection": "A condition signal has no accumulated credit; a later waiter still needs the predicate and proper notification protocol."
+  },
+  "Hoare-style signal": {
+    "series": "Jujutsu Kaisen",
+    "story": "Imagine a clerk immediately handing the counter to a waiting student when their equipment arrives, while the clerk waits in a priority return line.",
+    "connection": "The waiter runs immediately and the signaler waits urgently. Only one participant remains inside the monitor at a time."
+  },
+  "Mesa / Java-style notification": {
+    "series": "Naruto",
+    "story": "Imagine Kakashi announcing that a station may be available, then finishing his current task. By the time Naruto gets access, someone may have changed the situation.",
+    "connection": "A notified waiter reacquires the lock and rechecks the predicate in a while loop; notification is not a reservation."
+  },
+  "Priority wait": {
+    "series": "Demon Slayer",
+    "story": "Imagine trainees setting wake-up times and the attendant sorting the requests by those times instead of arrival order.",
+    "connection": "The condition queue uses an explicit priority. Equal-time waiters may all need release during the same tick."
+  },
+  "Readers-writers": {
+    "series": "Naruto",
+    "story": "Imagine several ninjas reading a mission scroll together, but a scribe needing exclusive access to revise it. New readers pause when a writer is waiting.",
+    "connection": "Concurrent reads are compatible; writes exclude readers and other writers. The course additionally batches waiting readers after a writer finishes."
+  },
+  "Dining philosophers": {
+    "series": "Demon Slayer",
+    "story": "Imagine five trainees in a circle, each needing both adjacent practice tools. If everyone grabs only the left tool, they can all wait forever.",
+    "connection": "Multiple resources create circular-wait risk. A solution should also allow nonadjacent trainees to practice together."
+  },
+  "Monitor test(i)": {
+    "series": "Jujutsu Kaisen",
+    "story": "Imagine five training stations in a ring. A waiting student can activate a station only when neither neighboring station is active; finishing prompts checks of both neighbors.",
+    "connection": "Test the requesting state and both neighbors atomically. Merely being hungry or waiting does not grant access."
+  },
+  "Elevator algorithm": {
+    "series": "Naruto",
+    "story": "Imagine a messenger moving upward through a tower, delivering pending scrolls in floor order, then reversing at the highest requested floor.",
+    "connection": "Sweep in the current direction, then reverse when no requests remain ahead. Count travel from the messenger’s starting floor too."
+  },
+  "Thread": {
+    "series": "Naruto",
+    "story": "Imagine several ninjas working on one mission. Each follows a separate set of steps while sharing the team’s scrolls and supplies.",
+    "connection": "The mission is the process; each execution path is a thread with its own place in the instructions."
+  },
+  "Round Robin (RR)": {
+    "series": "Demon Slayer",
+    "story": "Imagine trainees taking turns at one practice station. Each gets a fixed interval, then moves to the back of the line if more practice is needed.",
+    "connection": "The interval is the quantum. A finished trainee leaves the queue, and one waiting for equipment does not keep the station."
+  },
+  "Concurrency": {
+    "series": "Jujutsu Kaisen",
+    "story": "Imagine two students progressing through drills by alternating turns in one training arena. Both drills advance during the same afternoon.",
+    "connection": "Overlapping progress does not require simultaneous execution; one CPU can alternate between tasks."
+  },
+  "Parallelism": {
+    "series": "Naruto",
+    "story": "Imagine two ninjas practicing at separate stations at the same moment.",
+    "connection": "Separate processing units allow instructions from different tasks to execute simultaneously."
+  }
+};

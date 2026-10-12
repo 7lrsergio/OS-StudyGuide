@@ -1,0 +1,226 @@
+
+2.1 The process concept
+The process concept
+A process is an instance of a program being executed by an OS. Ex: When a user opens a new application like a web browser or text editor, the OS creates a new process.
+
+The OS itself is organized as a collection of processes.
+
+The OS keeps track of each process using a process control block (PCB): A data structure that holds information for a process, including the current instruction address, the execution stack, the set of resources used by the process, and the program being executed. The PCB also records the current state of the process, which can be running, ready to run when waiting for a CPU, or blocked when waiting for a temporarily unavailable resource. The PCB is the concrete representation of a process.
+
+participation activity
+2.1.1: OS creates a new PCB for every new process.
+
+ID: _________Password: _________User1***...ResourcesOS processesEdgeSkypeWordUser1EdgePCBPCBPCBPCBProgramProgramResourcesResourcesResourcesProgramProgram
+
+Captions
+Before a user logs in, only OS processes are running. Each process is represented by a PCB, which points to a program and the resources controlled by the process. Horizontal arrows represent program counters.
+When User1 logs in, a new PCB is created. The PCB points to User1's program, which typically executes the graphical user interface, and to initial resources. The program counter points to the start of the program.
+User1 is running. The screen shows the icons of different applications.
+When the user clicks the Microsoft Edge icon, a new PCB for Microsoft Edge is created by the OS.
+
+participation activity
+2.1.2: Basic principles of a process.
+1)
+An OS uses a PCB to represent a process.
+2)
+The PCB is created by the process when execution starts.
+3)
+The PCB becomes part of the program being executed by a process.
+4)
+Two processes can be executing the same program.
+
+The process concept by analogy
+A good way to understand the concept of a process is to consider an analogy from real life.
+
+participation activity
+2.1.3: Correspondence between the process concept and the employment agency analogy.
+
+WorkerEmployment agencyJob
+status
+record
+ResourcesJob
+step1
+step2
+  ...
+Working locationOS
+PCB
+ResourcesCPU
+Program
+instr1
+instr2
+  ...
+Memory
+
+Captions
+An agency employs a worker to perform various jobs. By analogy, the OS uses the CPU to execute different programs.
+The worker performs jobs consisting of multiple steps, analogous to the CPU, which executes programs consisting of multiple instructions.
+The agency sends the worker to a location where the job takes place. The work location corresponds to the memory where the program execution takes place.
+The agency creates a job status record, which is the dynamic representation of the job's progress, analogous to the PCB, which is the representation of the process.
+The job status record also keeps track of the resources assigned to the worker in the same way as the PCB keeps track of resources assigned to the process.
+
+participation activity
+2.1.4: Understanding the process concept via a student library analogy.
+A process can be compared to the act of reading a book checked out by a student from the reserved books section of a library.
+
+How to use this tool
+PCB
+program
+CPU
+memory
+OS
+The student corresponds to the _____.
+The book corresponds to the _____.
+The library reading room corresponds to the _____.
+The librarian corresponds to the _____.
+The check-out record corresponds to the _____.
+
+
+participation activity
+2.1.5: Process states and transitions.
+
+RunningReady
+Blocked
+      OS
+scheduling
+Request
+resource
+Release
+resource
+
+Captions
+A newly created process starts in the ready state.
+When the OS selects the process for execution, the process's state changes to running.
+When the OS interrupts the process, for example to let some other process use the CPU, the current process's state changes back to ready.
+When the OS again restarts the process, the process's state changes back to running.
+When the process requests a currently unavailable resource, such as a file already open by another user or some input data, the process's state changes to blocked.
+When some other process releases the resource or generates the data needed by the blocked process, the OS moves the blocked process back to ready.
+
+participation activity
+2.1.6: Process states and transitions.
+1)
+The transition (ready -> running) of a process p is caused by _____.
+2)
+The transition (running -> blocked) of a process p is caused by _____.
+3)
+The transition (running -> ready) of a process p is caused by _____.
+4)
+The transition (blocked -> ready) of a process p is caused by _____.
+
+Additional process states and transitions
+Some OSs provide a more complex set of states and transitions. The additional states may include the following:
+
+A newly created process is placed into the new state before the process is allowed to compete for the CPU. Ex: The OS may want to regulate the number of processes competing for the CPU.
+A process is placed into the terminated state when execution can no longer continue but before the PCB is deleted. Ex: The OS may want to examine the final state of a process that committed a fatal error.
+A process may be placed into the suspended state even though the CPU and all resources are available. Ex: The OS may want to stop a process to allow debugging or to regulate performance.
+participation activity
+2.1.7: Additional state transitions.
+
+ActivateTerminatedSuspendedNew
+Ready
+RunningBlocked
+      OS
+scheduling
+Request
+resource
+Release resourceEnd
+SuspendSuspendActivateActivateSuspend
+
+Captions
+A newly created process starts in the new state.
+The OS moves the process from new to ready when the process is allowed to compete for the CPU. The transition is called "Activate".
+From ready, the process can move repeatedly between running, blocked, and ready as before.
+In addition, the OS can move the process from the running, ready, or blocked state to a suspended state to temporarily prevent the process from making any progress.
+If the process was suspended in the blocked state, then upon reactivation the process returns to the blocked state.
+If the suspension occurred in the running or ready state, then upon reactivation the process is returned to the ready state.
+When a running process finishes all work or causes a fatal error, the process's state changes to terminated. The OS can also perform the transition to terminated from any other state.
+
+participation activity
+2.1.8: Additional process states and transitions.
+1)
+When a newly created process p is ready to compete for the CPU, p moves itself from the new to the ready state.
+2)
+When a ready process p wishes to temporarily stop competing for the CPU, p moves itself to the suspended state.
+3)
+The transition of a process p from running to terminated can be caused by p itself.
+4)
+When a blocked process p is suspended and the resource needed by p becomes available, p is moved to the ready state.
+
+participation activity
+2.1.9: Process reactivation.
+When a process p is moved from the current state (running, ready, or blocked) to the suspended state, then upon reactivation, ________.
+
+The context switch
+The CPU is always running one process at a time. Multiple processes can share a single CPU by taking turns. A context switch is the transfer of control from one process to another and may be triggered by the OS for scheduling reasons or caused by the inability of the current process to continue.
+
+Each time one process stops executing to allow another one to resume, the OS must save all information about the stopped process. This information is restored when the process again gets a chance to run. The temporary interruption is fully transparent to the process.
+
+The information that needs to be saved is called the CPU state. The CPU state consists of all intermediate values held in any CPU registers and hardware flags at the time of the interruption. One of the registers is the program counter, which determines the next instruction to execute after the process is restored.
+
+participation activity
+2.1.10: Context switches between processes p and q.
+
+- - - -  - - - -  qp- - - -  CPUpPCBsStateq
+RestoreSaveSaved CPU stateSaved CPU state
+
+Captions
+Process p is running. The current state of p is in the CPU, while p's PCB contains an out-of-date copy.
+A hardware interrupt transfers control to the OS, which saves the current CPU state in p's PCB.
+If the OS chooses process q to continue, the current CPU state is overwritten with q's last state from q's PCB.
+As q continues running, the saved state in q's PCB gets out of date. q's current state is maintained in the CPU.
+Another interrupt causes the current CPU state to be saved in q's PCB. The OS then may restart p by restoring p's saved state in the CPU.
+As p continues running, the saved state in the PCB gets out of date.
+
+participation activity
+2.1.11: Who causes a context switch.
+A context switch for a currently running process p may be caused by _____.
+
+1)
+process p itself
+2)
+the OS
+3)
+some other process q
+
+participation activity
+2.1.12: Current CPU state versus copy of CPU state in PCB.
+The PCB contains an up-to-date copy of the CPU state of a process p _____ .
+
+challenge activity
+2.1.1: State transitions.
+764382.5329120.qx3zqy7
+Which of the following state transitions are possible?
+1
+2
+3
+4
+5
+1
+2
+3
+4
+5
+
+Exercise
+2.1.1: State transitions.
+
+Indicate whether each series of state transitions is valid or invalid.
+
+(a)
+new ➛ ready ➛ suspended ➛ blocked ➛ suspended.
+
+(b)
+suspended ➛ blocked ➛ suspended ➛ blocked ➛ ready ➛ running.
+
+(c)
+running ➛ blocked ➛ ready ➛ blocked ➛ suspended.
+
+(d)
+new ➛ ready ➛ running ➛ ready ➛ new.
+
+
+How was this section?
+
+|
+
+
+Provide section feedback

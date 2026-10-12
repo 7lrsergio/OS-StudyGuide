@@ -1,0 +1,220 @@
+
+3.4: Scheduling of real-time processes
+
+Activities:
+P
+Participation
+Due: 09/10/2026, 11:59 PM CDT
+3.4 Scheduling of real-time processes
+A real-time process is characterized by continual input, which must be processed fast enough to generate nearly instantaneous output. Each arriving input item is subject to a deadline. Ex: Streaming of audio or video, processing and displaying radar data, control of robots or of fly-by-wire aircraft.
+
+A period is a time interval (typically in milliseconds or even microseconds) within which each input item must be processed. The end of each period is the implicit deadline for processing the current item.
+
+RM scheduling algorithm
+The rate monotonic (RM) algorithm schedules processes according to the period. The shorter the period, the higher the priority.
+
+RM is preemptive.
+
+participation activity
+3.4.1: Execution under RM scheduling.
+
+0123456timep1p2p1p2ProcessPeriodTot. CPUp1p24513......78910111213141516...
+
+Captions
+Two periodic processes. p1 and p2, with the given periods and total CPU times, are scheduled using RM.
+p1 has a period of 4. The first computation of length 1 must be performed within times 0 and 4.
+The next computation must be performed within the times 4 and 8, and so on.
+p2 has a period of 5. The first computation of length 3 must be performed within times 0 and 5, and so on.
+Under RM, p1 has always the higher priority and starts executing at time 0, followed by p2 at time 1.
+At time 4, the next iteration of p1 is available and runs from 4 to 5. The next iteration of p2 is available at time 5 and runs from 5 to 8.
+At time 8, p1 is again available and executes.
+p2 becomes available at time 10 and starts executing but does not complete because at time 12, p1 becomes available again.
+p1 has higher priority and interrupts p2. The last time unit of p2 is postponed until time 13.
+
+participation activity
+3.4.2: Execution under RM.
+Processes p1 and p2 with the following characteristics arrive at time 0:
+
+Process	Period	Total CPU time
+p1	8	3
+p2	10	6
+1)
+Process _________ starts first.
+2)
+Process p2 starts running at time _______.
+3)
+Process _________ will be running between times 8 and 9.
+
+EDF Scheduling algorithm
+The earliest deadline first (EDF) algorithm schedules processes according to the shortest remaining time until the deadline. The shorter the remaining time, the higher the priority.
+
+EDF is preemptive.
+
+participation activity
+3.4.3: Execution under EDF scheduling.
+
+0123456timep1p2p1p2ProcessPeriodTot. CPUp1p24513......78910111213141516
+
+Captions
+Two periodic processes, p1 and p2, with the given periods and total CPU times, are scheduled using EDF.
+The first computation of p1 has a deadline at 4 while the first computation of p2 has a deadline at 5.
+p1 has a higher priority than p2 and starts executing at time 0, followed by p2 at time 1.
+At time 4, the deadline of p1 moves to 8. Only p1 is available and so p1 runs from 4 to 5.
+The next iteration of p2 is available at time 5 with a deadline of 10. Only p2 is available and so p2 runs from 5 to 8. p2 is followed again by p1 at time 8 with a new deadline of 12.
+p2's deadline moves to 15 and since p1 is not available yet, p2 start executing.
+At time 12, p1 is again available with a deadline 16 and p2 still needs 1 more unit to complete with a deadline of 15.
+p2 has a higher priority and completes the computation at time 13. p1 follows from time 13 to 14.
+
+participation activity
+3.4.4: Execution under EDF.
+Processes p1 and p2 with the following characteristics arrive at time 0:
+
+Process	Period	Total CPU time
+p1	8	3
+p2	10	6
+1)
+p1's first deadline is _________.
+
+    
+
+
+Show answer
+2)
+p2's first deadline is _________.
+
+    
+
+
+Show answer
+3)
+Process _________ starts first.
+
+    
+
+
+Show answer
+4)
+Process _________ will be running between times 8 and 9.
+
+    
+
+
+Show answer
+
+Performance of the algorithms
+Real-time processes lie at the other extreme of time-criticality from batch processes and the most important goal of the scheduling algorithms is to meet all deadlines.
+
+A schedule is feasible if the deadlines of all processes can be met.
+
+The fraction of CPU time used by a process i, is 
+ where 
+ is the total CPU time and 
+ is the period of process i.
+
+The CPU utilization (U) is the sum of the individual fractions of CPU times used by each process.
+
+If U = 1 then the CPU is utilized 100%. A feasible schedule exists as long as U ≤ 1. No schedule is feasible if U > 1, since the total CPU time of all processes would exceed 100%.
+
+EDF is an optimal algorithm in that a feasible schedule is always guaranteed as long as U ≤ 1.
+RM is not guaranteed to produce a feasible schedule, but empirical evidence shows that RM is likely to produce a feasible schedule if U is less than approximately 0.7. The actual value depends on the particular set of processes.
+participation activity
+3.4.5: Advantage of EDF over RM scheduling.
+
+0123456timep1p2ProcessPeriodTot. CPUp1p281036......78910111213141516p1p2p1p2RMEDF
+
+Captions
+Two periodic processes p1 and p2, with the given periods and total CPU times, are scheduled.
+p1 starts first under both RM and EDF.
+p2 starts executing next under both RM and EDF.
+At time 8, p2 still needs to complete one more unit of computation (with a deadline of 10) but the next iteration of p1 is also available (with a deadline of 16).
+Under RM, p1 always has the higher priority and thus interrupts p2. The RM schedule fails at time 10, since p2 has missed the deadline.
+p2 has a shorter deadline than p1 and thus p2 is allowed to continue under EDF while p1 is delayed until time 9. Both processes meet the respective deadlines.
+
+participation activity
+3.4.6: Minimum periods for feasible schedules.
+n periodic processes are sharing the CPU. The total CPU time for each process is 2 ms and the period for each process is D.
+
+1)
+The period must be at least _________ ms for EDF to produce a feasible schedule when n = 5.
+2)
+In general, the period must be at least _________ ms for EDF to produce a feasible schedule for the n processes.
+3)
+The period must be greater than _________ ms for RM to likely produce a feasible schedule.
+
+challenge activity
+3.4.1: Real-time scheduling.
+764382.5329120.qx3zqy7
+Three periodic processes with the following characteristics are to be scheduled.
+Process	Period	Total CPU time
+p1	5	2
+p2	4	1
+p3	8	4
+The CPU utilization is U =
+
+Does a feasible schedule exist?
+Ex: 1.23
+
+Pick
+1
+2
+3
+4
+1
+2
+3
+4
+
+Exercise
+3.4.1: Real-time scheduling under EDF and RM.
+
+Three periodic processes with the following characteristics are to be scheduled:
+(D is the period and T is the total CPU time)
+
+
+D	T
+p1	20	5
+p2	100	10
+p3	120	42
+(a)
+Determine if a feasible schedule exists.
+
+(b)
+Determine how many more processes, each with T = 3 and D = 20, can run concurrently under EDF.
+
+(c)
+Determine how many more processes, each with T = 3 and D = 20, can run concurrently under RM.
+
+
+Exercise
+3.4.2: Determine feasible schedules.
+
+Three periodic processes with the following characteristics are to be scheduled:
+(D is the period and T is the total CPU time)
+
+Case 1	D	T
+p1	50	3
+p2	1000	70
+p3	40	5
+Case 2	D	T
+p1	50	15
+p2	10	5
+p3	4	1
+Case 3	D	T
+p1	20	5
+p2	10	7
+p3	100	4
+(a)
+For each case, determine if a feasible schedule is likely to be generated by:
+
+RM
+EDF
+(b)
+Draw a timing diagram for the first 25 time units. For each of the 3 cases, show the schedules produced by RM and by EDF.
+
+
+How was this section?
+
+|
+
+
+Provide section feedback

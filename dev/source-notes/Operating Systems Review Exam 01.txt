@@ -1,0 +1,51 @@
+
+PAGE 1
+Operating Systems 
+Exam 1 Review
+Dale Thompson, Ph.D., P .E.
+1
+
+PAGE 2
+Exam 1 Review
+• Wednesday, Oct. 14, at 2 pm. in JBHT 216
+• Modules 1, 2, 3, and 4
+• Bring student ID to verify identity.
+• Bring calculator .
+• In-person and paper-based
+• Multiple-choice, fill-in-the blank, short answer , and short-
+problem questions of unequal weight
+• 50 minutes to complete the test
+• Study quizzes, homework, zyBook, notes, slides, lectures
+• Write your answers on the exam.
+• For those students that need accommodations, you must 
+schedule through the Test Center as soon as possible.
+2
+
+PAGE 3
+Modules
+• Module 1: Introduction
+• Module 2: Processes, Threads, and 
+Resources (more emphasis)
+• Module 3: Scheduling (more emphasis)
+• Module 4: Concurrency (more emphasis)
+3
+
+PAGE 4
+Module 1: Introduction
+• Goal document
+4
+
+PAGE 5
+Module 2: Processes, Threads, and Resources
+• Goal document
+5
+
+PAGE 6
+Module 3: Scheduling
+• Goal document
+6
+
+PAGE 7
+Module 4: Concurrency
+• Goal document
+7

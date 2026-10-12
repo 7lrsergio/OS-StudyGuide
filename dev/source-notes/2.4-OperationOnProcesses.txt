@@ -1,0 +1,213 @@
+
+2.4 Operations on processes
+The process creation hierarchy
+A process creation hierarchy is a graphical representation of the dynamically changing parent-child relationships among all processes. The process creation hierarchy changes each time a process is created or destroyed.
+
+participation activity
+2.4.1: The process creation hierarchy.
+
+InitUser1User2EdgeSkypeWeatherComp1Comp2. . .. . .Root
+OS1OS2. . .User3UserNComp3Level 0Level 1Level 2Level 3Level 4
+
+Captions
+When the OS starts, a Root process is created (Level 0), which becomes the parent of other OS processes (Level 1).
+One of the OS processes becomes the highest ancestor of all user processes. Ex: In Unix this ancestor process is called Init.
+Whenever a new user logs in, a new user process is created (Level 2). The main task of each user process is to communicate with the user.
+Each User process can itself create child processes to perform various tasks (Level 3). Ex: A browser (Edge), a communication tool (Skype), or a scientific simulator (Weather).
+Each child processes can in turn create other child processes (Level 4). Ex: Weather could create processes to perform independent sub-computations in parallel.
+When a process is destroyed, the question arises: What to do with the destroyed process's children?
+Some OSs (Ex: Unix) make the Init process the new parent of the deleted process's children.
+Other OSs choose to destroy the process as well as all of the process's descendants.
+
+participation activity
+2.4.2: Number of parents and children.
+1)
+A process at level i in the process creation hierarchy can have ______ link(s) to processes at the next higher level i-1.
+
+    
+
+
+Show answer
+2)
+A newly created process (still in the state new) at level i can have ______ links to processes at level i+1.
+
+    
+
+
+Show answer
+
+participation activity
+2.4.3: Link direction in the process creation hierarchy.
+Each link in the process creation hierarchy corresponds to a ________.
+
+Process creation
+When the currently running process initiates the creation of a child process, the OS executes a create process function, create(). The create process function allocates a new PCB, fills the PCB entries with initial values, and links the PCB to other data structures in the system:
+
+A new PCB is allocated. The PCB is uniquely identified by a pointer or an array index p.
+The fields cpu_state, memory, scheduling_information, and accounting_information are filled using the initial values supplied to the function as parameters.
+Assuming the state transition diagram consists of only the three states, running, ready, and blocked, the process state field is set to ready.
+The parent field of process p is set to point to self, which is the calling process and thus the parent of p.
+In turn, process p is inserted into the calling process's list of children as a new child.
+The remaining fields are set to NULL, since at creation process p has no children, no open files, and no other resources.
+p is inserted into the RL.
+The scheduler function is called to select the process to run. Depending on the priorities of the two processes, the scheduler could choose to start the new child process p or to continue the execution of p's parent process.
+When the scheduler returns, the function returns the ID of the new child (p) to the calling process.
+Figure 2.4.1: The create process function.
+p = create(state0, mem0, sched0, acc0) { 
+      p = allocate new PCB
+      p.cpu_state = state0
+      p.memory = mem0
+      p.scheduling_information = sched0
+      p.accounting_information = acc0
+      p.process_state = ready
+      p.parent = self
+      insert process p into self.children
+      p.children = NULL
+      p.open_files = NULL
+      p.other_resources = NULL
+      insert process p into RL
+      scheduler()
+      return p
+   }
+
+participation activity
+2.4.4: Filling the PCB data structure.
+The create() function fills the various fields of p's PCB from different sources. Identify the correct source for each given sample field.
+
+How to use this tool
+constant value
+NULL
+input parameter
+pointer or index
+p.memory
+p.process_state
+p.parent
+p.open_files
+
+
+participation activity
+2.4.5: Managing a new PCB.
+1)
+The initial CPU state of a newly created process is NULL or undefined.
+2)
+The initial value of the process_state field could be set to blocked if memory or some other critical resource is unavailable.
+3)
+When a new process p is created, the scheduler could select p to run next.
+
+Process destruction
+A process p can be terminated by the parent process by calling the function destroy(p). Completing all work or committing a fatal error also results in the process's destruction. The destroy process function destroys a process by freeing the PCB data structure and removing any references to the PCB from the system.
+
+Depending on the OS, the destroy function may also destroy all of the process's descendants to prevent having "orphan" processes in the system. The destruction of the entire hierarchy of descendants is accomplished by calling destroy(c) recursively on all children c of p.
+
+The destroy() function performs the following steps:
+
+After calling destroy(c) on all child processes, remove process p from either the RL (when p is ready) or from the waiting list of a resource (when p is blocked).
+Remove process p from the list of children of the calling process.
+Release all memory and other resources, close all open files, and deallocate the PCB.
+Call the scheduler to select the next process to run. The call must be made outside of the destroy(p) function to guarantee that the scheduler executes only once, after the entire hierarchy of processes has been destroyed, rather than as part of every recursive call to destroy(c).
+Figure 2.4.2: The destroy process function.
+destroy(p) {
+   for all c in p.children destroy(c) 
+   remove process p from RL or waiting list
+   remove process p from parent's list of children
+   release p.memory 
+   release p.other_resources 
+   close all p.open_files 
+   deallocate PCB
+}
+scheduler()
+
+participation activity
+2.4.6: Descendants of a destroyed process.
+When a process p is destroyed, the following choices can be made for p's children:
+
+1)
+The children are recursively destroyed along with p.
+2)
+The children are assigned to a specialized OS process (Ex: the init process in Unix) as the new parent.
+3)
+The children could be left without any parent.
+
+participation activity
+2.4.7: Implementing the destroy function.
+1)
+To close files should be the responsibility of the programmer, rather than being performed automatically as part of the destroy function.
+2)
+Any process is either on the RL and in the ready or running state, or on a resource's waiting list and in the blocked state. To efficiently find on which lists p resides, additional information must be kept in the PCB.
+
+participation activity
+2.4.8: Destroying self.
+What would be the most likely outcome if a process called destroy(self):
+
+challenge activity
+2.4.1: Operations on processes.
+764382.5329120.qx3zqy7
+A process described by PCB 3 executes the operation create(c, d, e, f)
+The process is allocated to a new PCB 7.
+
+Complete all fields in the following diagram resulting from the creation. For empty or undefined fields, enter: NULL
+...	3	...	7
+CPU_state	   	                 	   	                     
+process_state	   	          	   	                 
+memory	   	          	   	                 
+scheduling_information	   	          	   	                 
+accounting_information	   	          	   	                 
+open_files	   	          	   	                 
+other_resources	   	          	   	                 
+parent	   	          	   	                 
+children	   	          	   	                 
+           
+↓
+Pick
+Ex: 1
+
+Pick
+1
+2
+3
+1
+2
+3
+
+Exercise
+2.4.1: The suspend and activate functions.
+
+The create and destroy functions govern the existence of a process. The process then moves through the running, ready, and blocked states based on resource needs, as discussed in subsequent sections. To support process suspension, the Suspended state is divided into two separate states, suspended_ready and suspended_blocked, to keep track of the state in which a process was suspended. The following pseudo code shows the corresponding suspend() and activate() functions.
+
+suspend(p) {
+   if (p.process_state == blocked) {
+      p.process_state = suspended_blocked
+   }
+   else {
+      p.process_state = suspended_ready
+   }
+}
+ 
+activate(p) {
+   if (p.process_state == suspended_ready) {
+      p.process_state = ready
+   }
+   else {
+      p.process_state = blocked
+   }
+   scheduler()
+}
+(a)
+What changes must be made to the scheduler or other functions to make suspend/activate work correctly?
+
+(b)
+Why is the scheduler called only in activate but not in suspend?
+
+(c)
+A process must be prevented from calling suspend() or activate() on itself. Why?
+
+(d)
+A process must be prevented from calling suspend() on an already suspended process, or calling activate() on a currently active (ready) process. Why?
+
+
+How was this section?
+
+|
+
+
+Provide section feedback
